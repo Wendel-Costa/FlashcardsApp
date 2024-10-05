@@ -1,8 +1,6 @@
 import express from "express";
 import conectarNaDatabase from "./config/dbConnect.js";
-
-// testando conexao
-import user from "./models/User.js";
+import routes from "./routes/index.js";
 
 const conexao = await conectarNaDatabase();
 
@@ -15,14 +13,6 @@ conexao.once("open", () => {
 })
 
 const app = express();
-
-app.get("/", (req,res) => {
-    res.status(200).send("App de flashcards 100% atualizado!");
-});
-
-app.get("/users", async (req,res) => {
-    const listaUsers = await user.find({});
-    res.status(200).json(listaUsers);
-});
+routes(app);
 
 export default app;
