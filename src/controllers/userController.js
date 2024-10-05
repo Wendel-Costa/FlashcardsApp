@@ -14,7 +14,7 @@ class UserController {
     static async listarUserPorId(req, res) {
         try {
             const id = req.params.id;
-            const userEncontrado = await user.findById(id);
+            const userEncontrado = await user.findById(id).populate('cards');
             res.status(200).json(userEncontrado);
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha na requisição do usuário` });
