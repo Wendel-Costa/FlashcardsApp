@@ -1,0 +1,10 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.main_input{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

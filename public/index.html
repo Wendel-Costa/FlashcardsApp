@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Flash Cards</title>
+</head>
+
+<body>
+
+    <header class="header">
+        <p>App de flash cards</p>
+    </header>
+
+    <section class="login">
+
+    </section>
+
+    <main class="main">
+        <section class="main_input">
+            <div class="main_input_opcoes">
+                <label for="topico">Tópico:</label>
+                <input type="text" id="topico" name="topico">
+            </div>
+
+            <div class="main_input_opcoes">
+                <label for="detalhes">Nível de detalhes:</label>
+                <div id="detalhes">
+                    <label>
+                        <input type="radio" name="nivelDetalhe" value="basico" checked> Básico
+                    </label>
+                    <label>
+                        <input type="radio" name="nivelDetalhe" value="intermediario"> Intermediário
+                    </label>
+                    <label>
+                        <input type="radio" name="nivelDetalhe" value="detalhado"> Detalhado
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" onclick="gerarFlashcards()">Gerar Flashcards</button>
+        </section>
+
+        <section class="main_output"></section>
+    </main>
+</body>
+
+</html>
