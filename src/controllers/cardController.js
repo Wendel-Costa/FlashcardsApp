@@ -1,5 +1,6 @@
 import card from "../models/Card.js";
 import user from "../models/User.js";
+import gerarTexto from "../api/geminiApp.js";
 
 class CardController {
     static async listarCards(req, res) {
@@ -52,6 +53,36 @@ class CardController {
             await user.findByIdAndUpdate(dono, { $push: { cards: novoCard._id } });
 
             res.status(201).json({message: "Card criado com sucesso", card: novoCard});
+
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
+        }
+    }
+
+    static async gerarCardPorIA(req, res) {
+        const { topico, detalhe } = req.body;
+        try {
+            const {dono} = req.body;
+            const usuario = await user.findById(dono);
+
+           if (!usuario){
+                return res.status(404).json({message: "Usuário não encontrado"})
+            }
+
+            const respostaIA = await gerarTexto(topico,detalhe);
+
+            const novoCardcomIA = {
+                pergunta: req.body.pergunta,
+                resposta: respostaIA,
+                tag: req.body.tag,
+                dono: req.body.dono
+            };
+
+            const novoCard = await card.create(novoCardcomIA);
+
+            await user.findByIdAndUpdate(dono, { $push: { cards: novoCard._id } });
+
+            res.status(201).json({message: 'Card gerado por IA com sucesso', card: `Card: ${novoCard}`});
 
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
