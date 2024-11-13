@@ -82,7 +82,7 @@ class CardController {
 
             await user.findByIdAndUpdate(dono, { $push: { cards: novoCard._id } });
 
-            res.status(201).json({message: 'Card gerado por IA com sucesso', card: `Card: ${novoCard}`});
+            res.status(201).json({message: 'Card gerado por IA com sucesso', card: novoCard});
 
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
