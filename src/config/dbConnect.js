@@ -1,8 +1,6 @@
 import "dotenv/config"
 import mongoose from "mongoose";
 
-console.log("DB_CONEXAO_STRING:", process.env.DB_CONEXAO_STRING);
-
 async function conectarNaDatabase() {
     try {
         await mongoose.connect(process.env.DB_CONEXAO_STRING, {
