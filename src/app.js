@@ -2,7 +2,7 @@ import express from "express";
 import conectarNaDatabase from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 
-import cors from "cors"; // Importa o pacote CORS
+import cors from "cors";
 
 
 
@@ -18,8 +18,9 @@ conexao.once("open", () => {
 
 const app = express();
 
-app.use(cors());
-
+app.use(cors({
+    origin: 'https://apiflashcards.vercel.app/'
+  }));
 
 routes(app);
 
