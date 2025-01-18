@@ -1,4 +1,5 @@
 const URL = 'https://apiflashcards.vercel.app/cards';
+const URLCRIARCARD = 'https://apiflashcards.vercel.app/cards/gerartexto'
 
 const mainOutput = document.querySelector('.main_output');
 
@@ -45,6 +46,8 @@ async function gerarFlashcardIA() {
 
     const dono = '67017e8854838b0101646790';
 
+    const resposta = 'oi';
+
     if (!topico || !detalhe || !pergunta || !tag) {
         alert('Preencha todos os campos!');
         return;
@@ -55,14 +58,15 @@ async function gerarFlashcardIA() {
         detalhe,
         pergunta,
         tag,
-        dono
+        dono,
+        resposta
     };
 
     const mainOutput = document.querySelector('.main_output');
     mainOutput.innerHTML = '<p class="loading">Carregando...</p>';
 
     try {
-        const resp = await fetch(URL, {
+        const resp = await fetch(URLCRIARCARD, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -83,16 +87,15 @@ async function gerarFlashcardIA() {
     }
 }
 
+function exibirCard(card) {
+    const mainOutput = document.querySelector('.main_output');
+    mainOutput.innerHTML = `
+        <div class="flashcard">
+            <h3>${card.pergunta}</h3>
+            <p><strong>Resposta:</strong> ${card.resposta}</p>
+            <p><strong>Tag:</strong> ${card.tag}</p>
+        </div>
+    `;
+}
+
 document.querySelector('#botaoGerarCard').addEventListener('click', gerarFlashcardIA);
-
-/*document.querySelector('#botaoGerarCard').addEventListener('click', () => chamarApi());
-
-function gerarFlashcards(){
-    const topico = document.querySelector("#topico").value;
-    const detalhe = document.querySelector('input[name="nivelDetalhe"]:checked').value;
-
-    console.log(topico);
-    console.log(detalhe);
-    //gerarTexto(topico);
-    alert("Ok");
-}*/

@@ -69,12 +69,7 @@ class CardController {
                 return res.status(404).json({message: "Usuário não encontrado"})
             }
 
-            const respostaIA = await gerarTexto(topico,detalhe);
-            /* testee */
-            if (!respostaIA || respostaIA.trim() === '') {
-                return res.status(400).json({ message: "A IA não gerou uma resposta válida." });
-            }
-            
+            const respostaIA = await gerarTexto(topico,detalhe);           
 
             const novoCardcomIA = {
                 pergunta: req.body.pergunta,
