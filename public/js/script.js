@@ -1,5 +1,5 @@
-const URL = 'https://apiflashcards.vercel.app/cards';
-const URLCRIARCARD = 'https://apiflashcards.vercel.app/cards/gerartexto'
+const URL = 'https://apiflashcards.vercel.app/api/cards';
+const URLCRIARCARD = 'https://apiflashcards.vercel.app/api/cards/gerartexto'
 
 const mainOutput = document.querySelector('.main_output');
 
