@@ -1,6 +1,10 @@
 const URL = 'https://apiflashcards.vercel.app/cards';
 
+const mainOutput = document.querySelector('.main_output');
+
 async function chamarApi() {
+    mainOutput.innerHTML = '<p class="loading">Carregando...</p>';
+
     const resp = await fetch(URL);
     let cards;
     if (resp.status === 200){
@@ -13,12 +17,11 @@ async function chamarApi() {
 
 function exibirFlashcards(cards) {
     const outputSection = document.querySelector('.main_output');
-    outputSection.innerHTML = ''; // Limpa o conteúdo anterior
+    outputSection.innerHTML = '';
 
     cards.forEach(card => {
         const cardElement = document.createElement('div');
-        cardElement.classList.add('flashcard'); // Adicione uma classe para estilizar
-
+        cardElement.classList.add('flashcard');
         cardElement.innerHTML = `
             <h3>${card.pergunta}</h3>
             <p><strong>Resposta:</strong> ${card.resposta}</p>
@@ -29,8 +32,10 @@ function exibirFlashcards(cards) {
     });
 }
 
-document.querySelector('#botaoGerarCard').addEventListener('click', () => chamarApi());
-/*
+window.addEventListener('DOMContentLoaded', () => chamarApi());
+
+/*document.querySelector('#botaoGerarCard').addEventListener('click', () => chamarApi());
+
 function gerarFlashcards(){
     const topico = document.querySelector("#topico").value;
     const detalhe = document.querySelector('input[name="nivelDetalhe"]:checked').value;
