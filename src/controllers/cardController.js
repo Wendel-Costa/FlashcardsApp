@@ -70,6 +70,11 @@ class CardController {
             }
 
             const respostaIA = await gerarTexto(topico,detalhe);
+            /* testee */
+            if (!respostaIA || respostaIA.trim() === '') {
+                return res.status(400).json({ message: "A IA não gerou uma resposta válida." });
+            }
+            
 
             const novoCardcomIA = {
                 pergunta: req.body.pergunta,
