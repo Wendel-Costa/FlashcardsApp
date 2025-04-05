@@ -5,7 +5,8 @@ import gerarTexto from "../api/geminiApp.js";
 class CardController {
     static async listarCards(req, res) {
         try {
-            const listaCards = await card.find({});
+            const userId = req.userId;
+            const listaCards = await card.find({ dono: userId });
             res.status(200).json(listaCards);
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao listar cards` });
@@ -14,16 +15,20 @@ class CardController {
 
     static async listarCardsPorUsuario(req, res) {
         try {
-            const userId = req.params.id;  
+            const userId = req.params.id;
             const usuario = await user.findById(userId);
 
             if (!usuario) {
                 return res.status(404).json({ message: "Usuário não encontrado" });
             }
 
+            if (req.userId !== userId) {
+                return res.status(403).json({ message: "Não autorizado a listar cards deste usuário." });
+            }
+
             const cardsDoUsuario = await card.find({ dono: userId });
             res.status(200).json(cardsDoUsuario);
-            
+
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao listar cards do usuário` });
         }
@@ -33,6 +38,11 @@ class CardController {
         try {
             const id = req.params.id;
             const cardEncontrado = await card.findById(id).populate('dono');
+
+            if (cardEncontrado && cardEncontrado.dono.toString() !== req.userId) {
+                return res.status(403).json({ message: "Não autorizado a acessar este card." });
+            }
+
             res.status(200).json(cardEncontrado);
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha na requisição do card` });
@@ -41,18 +51,14 @@ class CardController {
 
     static async cadastrarCard(req, res) {
         try {
-            const {dono} = req.body;
-            const usuario = await user.findById(dono)
-
-            if (!usuario){
-                return res.status(404).json({message: "Usuário não encontrado"})
-            }
+            const userId = req.userId;
+            req.body.dono = userId;
 
             const novoCard = await card.create(req.body);
 
-            await user.findByIdAndUpdate(dono, { $push: { cards: novoCard._id } });
+            await user.findByIdAndUpdate(userId, { $push: { cards: novoCard._id } });
 
-            res.status(201).json({message: "Card criado com sucesso", card: novoCard});
+            res.status(201).json({ message: "Card criado com sucesso", card: novoCard });
 
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
@@ -62,14 +68,10 @@ class CardController {
     static async gerarCardPorIA(req, res) {
         const { topico, detalhe } = req.body;
         try {
-            const {dono} = req.body;
-            const usuario = await user.findById(dono);
+            const userId = req.userId;
+            req.body.dono = userId;
 
-           if (!usuario){
-                return res.status(404).json({message: "Usuário não encontrado"})
-            }
-
-            const respostaIA = await gerarTexto(topico,detalhe);           
+            const respostaIA = await gerarTexto(topico, detalhe);
 
             const novoCardcomIA = {
                 pergunta: req.body.pergunta,
@@ -80,9 +82,9 @@ class CardController {
 
             const novoCard = await card.create(novoCardcomIA);
 
-            await user.findByIdAndUpdate(dono, { $push: { cards: novoCard._id } });
+            await user.findByIdAndUpdate(userId, { $push: { cards: novoCard._id } });
 
-            res.status(201).json({message: 'Card gerado por IA com sucesso', card: novoCard});
+            res.status(201).json({ message: 'Card gerado por IA com sucesso', card: novoCard });
 
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
@@ -92,8 +94,14 @@ class CardController {
     static async atualizarCard(req, res) {
         try {
             const id = req.params.id;
+            const cardParaAtualizar = await card.findById(id);
+
+            if (!cardParaAtualizar || cardParaAtualizar.dono.toString() !== req.userId) {
+                return res.status(403).json({ message: "Não autorizado a atualizar este card." });
+            }
+
             await card.findByIdAndUpdate(id, req.body);
-            res.status(200).json({message: "Card atualizado com sucesso"});
+            res.status(200).json({ message: "Card atualizado com sucesso" });
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha na atualização do card` });
         }
@@ -102,19 +110,21 @@ class CardController {
     static async excluirCard(req, res) {
         try {
             const id = req.params.id;
-            const cardExcluido = await card.findByIdAndDelete(id);
+            const cardExcluido = await card.findById(id);
 
-            if (!cardExcluido) {
-                return res.status(404).json({ message: "Card não encontrado" });
+            if (!cardExcluido || cardExcluido.dono.toString() !== req.userId) {
+                return res.status(403).json({ message: "Não autorizado a excluir este card." });
             }
 
-            const usuario = await user.findById(cardExcluido.dono);
+            await card.findByIdAndDelete(id);
+
+            const usuario = await user.findById(req.userId);
             if (usuario) {
-                usuario.cards.pull(cardExcluido._id);
+                usuario.cards.pull(id);
                 await usuario.save();
             }
 
-            res.status(200).json({message: "Card excluído com sucesso"});
+            res.status(200).json({ message: "Card excluído com sucesso" });
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha na exclusão do card` });
         }
