@@ -4,8 +4,6 @@ import mongoose from "mongoose";
 async function conectarNaDatabase() {
     try {
         await mongoose.connect(process.env.DB_CONEXAO_STRING, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverSelectionTimeoutMS: 10000,
         });
         console.log("Conectado ao MongoDB!");
