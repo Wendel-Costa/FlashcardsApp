@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 const URL_CARDS = `${API_BASE_URL}/cards`;
 const URL_CRIAR_CARD = `${API_BASE_URL}/cards/gerartexto`;
 const URL_REGISTER = `${API_BASE_URL}/users/register`;
