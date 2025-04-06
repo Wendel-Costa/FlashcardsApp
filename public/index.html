@@ -15,26 +15,53 @@
     </header>
 
     <section class="login">
+        <div id="login-container">
+            <h2>Login</h2>
+            <form id="login-form">
+                <div>
+                    <label for="login-username">Nome de Usuário:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div>
+                    <label for="login-password">Senha:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit">Entrar</button>
+                <p>Não tem uma conta? <a href="#" id="show-register-form">Registre-se</a></p>
+                <div id="login-message" class="message"></div>
+            </form>
+        </div>
 
+        <div id="register-container" style="display: none;">
+            <h2>Registro</h2>
+            <form id="register-form">
+                <div>
+                    <label for="register-username">Nome de Usuário:</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div>
+                    <label for="register-password">Senha:</label>
+                    <input type="password" id="register-password" name="password" required>
+                </div>
+                <button type="submit">Registrar</button>
+                <p>Já tem uma conta? <a href="#" id="show-login-form">Faça login</a></p>
+                <div id="register-message" class="message"></div>
+            </form>
+        </div>
     </section>
 
-    <main class="main">
+    <main class="main" style="display: none;">
         <section class="main_input">
-            <div class="main_input_opcoes">
-                <label for="topico">Tópico:</label>
-                <input type="text" id="topico" name="topico">
-            </div>
-        
             <div class="main_input_opcoes">
                 <label for="pergunta">Pergunta:</label>
                 <input type="text" id="pergunta" name="pergunta">
             </div>
-        
+
             <div class="main_input_opcoes">
                 <label for="tag">Tag:</label>
                 <input type="text" id="tag" name="tag">
             </div>
-        
+
             <div class="main_input_opcoes">
                 <label for="detalhes">Nível de detalhes:</label>
                 <div id="detalhes">
@@ -49,12 +76,45 @@
                     </label>
                 </div>
             </div>
-        
+
+            <div class="main_input_opcoes">
+                <label for="tom">Tom da resposta:</label>
+                <select id="tom" name="tom">
+                    <option value="neutro" selected>Neutro</option>
+                    <option value="formal">Formal</option>
+                    <option value="informal">Informal</option>
+                    <option value="conciso">Conciso</option>
+                    <option value="detalhado">Detalhado</option>
+                </select>
+            </div>
+
             <button type="button" id="botaoGerarCard">Gerar Flashcards</button>
+            <button type="button" id="start-anki-study">Iniciar Estudo Anki</button>
         </section>
 
         <section class="main_output"></section>
+
+        <section class="anki-study" style="display: none;">
+            <h2>Estudo Anki</h2>
+            <div class="anki-card">
+                <div class="anki-card-question">
+                    </div>
+                <button id="show-answer-btn">Mostrar Resposta</button>
+                <div class="anki-card-answer" style="display: none;">
+                    <div class="anki-buttons">
+                        <button class="wrong-btn">Errei</button>
+                        <button class="correct-btn">Acertei</button>
+                    </div>
+                </div>
+            </div>
+            <button id="next-card-btn" style="display: none;">Próximo Card</button>
+            <p id="anki-message"></p>
+            <button id="back-to-create-btn">Voltar para Criar</button>
+        </section>
     </main>
+
+    <button id="logout-button" style="display: none;">Sair</button>
+
     <script type="module" src="js/script.js"></script>
 </body>
 

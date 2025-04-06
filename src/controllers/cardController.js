@@ -5,8 +5,8 @@ import gerarTexto from "../api/geminiApp.js";
 class CardController {
     static async listarCards(req, res) {
         try {
-            const userId = req.userId;
-            const listaCards = await card.find({ dono: userId });
+            const userId = req.userId; // Obtém o ID do usuário autenticado do middleware
+            const listaCards = await card.find({ dono: userId }); // Busca apenas os cards do usuário logado
             res.status(200).json(listaCards);
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao listar cards` });
@@ -22,6 +22,7 @@ class CardController {
                 return res.status(404).json({ message: "Usuário não encontrado" });
             }
 
+            // Adicione esta verificação para garantir que o usuário autenticado só veja seus próprios cards
             if (req.userId !== userId) {
                 return res.status(403).json({ message: "Não autorizado a listar cards deste usuário." });
             }
@@ -39,6 +40,7 @@ class CardController {
             const id = req.params.id;
             const cardEncontrado = await card.findById(id).populate('dono');
 
+            // Garante que o card pertence ao usuário autenticado
             if (cardEncontrado && cardEncontrado.dono.toString() !== req.userId) {
                 return res.status(403).json({ message: "Não autorizado a acessar este card." });
             }
@@ -66,12 +68,12 @@ class CardController {
     }
 
     static async gerarCardPorIA(req, res) {
-        const { topico, detalhe } = req.body;
+        const {detalhe, tom } = req.body;
         try {
             const userId = req.userId;
             req.body.dono = userId;
 
-            const respostaIA = await gerarTexto(topico, detalhe);
+            const respostaIA = await gerarTexto(req.body.pergunta, detalhe, tom);
 
             const novoCardcomIA = {
                 pergunta: req.body.pergunta,

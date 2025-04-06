@@ -1,11 +1,12 @@
 import express from "express";
-import users from "./userRoutes.js";
-import cards from "./cardRoutes.js";
+import userRoutes from "./userRoutes.js";
+import cardRoutes from "./cardRoutes.js";
 
-const routes = (app) => {
-    app.route("/").get((req,res) => res.status(200).send("App de flahscards 100% atualizado"))
+const router = express.Router();
 
-    app.use("/api", express.json(), users, cards);
-}
+router.get("/", (req, res) => res.status(200).send("App de flashcards 100% atualizado"));
 
-export default routes;
+router.use("/users", userRoutes);
+router.use("/cards", cardRoutes);
+
+export default router;
