@@ -194,7 +194,7 @@ async function gerarFlashcardIA() {
     const tag = document.querySelector('#tag').value;
     const tom = document.querySelector('#tom').value;
 
-    if (!pergunta || !tag) { // Removi a validação de 'topico'
+    if (!pergunta || !tag) {
         alert('Preencha todos os campos!');
         return;
     }
@@ -221,6 +221,7 @@ async function gerarFlashcardIA() {
         if (resp.status === 201) {
             const resposta = await resp.json();
             exibirCard(resposta.card);
+            flashcards.unshift(resposta.card);
         } else if (resp.status === 401) {
             mainOutput.innerHTML = '<p class="error">Sua sessão expirou. Por favor, faça login novamente.</p>';
             logout();
