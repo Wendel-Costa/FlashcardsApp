@@ -1,326 +1,322 @@
+/* VARIAVEIS GLOBAIS */
+:root {
+    --bg-dark: #121212;
+    --bg-surface: #1e1e1e;
+    --bg-surface-hover: #2a2a2a;
+    --border-color: #3a3a3a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --primary-accent: #00bcd4;
+    --primary-accent-hover: #00dcf4;
+    --success: #4caf50;
+    --warning: #ffc107;
+    --danger: #f44336;
+    --font-main: 'Inter', sans-serif;
+    --font-code: 'Source Code Pro', monospace;
+}
+
+/* ESTILOS GLOBAIS */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
 }
 
 body {
-    background-color: #f4f4f9;
-    color: #333;
+    font-family: var(--font-main);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
     line-height: 1.6;
 }
 
-.header {
-    background-color: #4a90e2;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-}
-
-.main_input {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.main_input_opcoes {
-    margin-bottom: 20px;
-}
-
-.main_input_opcoes label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-.main_input_opcoes input[type="text"] {
+/* LAYOUT PRINCIPAL */
+.view {
+    display: none;
     width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s;
+    min-height: 100vh;
 }
 
-.main_input_opcoes input[type="text"]:focus {
-    border-color: #4a90e2;
-    outline: none;
-}
-
-.main_input_opcoes input[type="radio"] {
-    margin-right: 10px;
-}
-
-#botaoGerarCard, #start-anki-study{
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin: 1rem;
-}
-
-#botaoGerarCard:hover, #start-anki-study:hover {
-    background-color: #3b78c0;
-}
-
-.main_output {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.flashcard {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    text-align: left;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.flashcard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.flashcard h3 {
-    margin-bottom: 10px;
-    color: #4a90e2;
-    font-size: 1.2rem;
-}
-
-.flashcard p {
-    margin: 5px 0;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-    .main_input {
-        padding: 15px;
-    }
-
-    .flashcard {
-        padding: 15px;
-    }
-
-    #botaoGerarCard {
-        font-size: 0.9rem;
-        padding: 8px;
-    }
-}
-
-.login {
+.view.active-view {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    min-height: calc(100vh - 5rem); /* Ajusta a altura para descontar o header */
-    padding: 20px;
-    background-color: #f0f0f0;
 }
 
-#login-container, #register-container {
-    background-color: white;
-    padding: 30px;
+.main-view {
+    display: none;
+    width: 100%;
+}
+
+.main-view.active-view {
+    display: block;
+}
+
+/* TELA DE AUTENTICAÇÃO */
+#auth-view {
+    justify-content: center;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: var(--bg-surface);
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    max-width: 100%;
+    border: 1px solid var(--border-color);
 }
 
-#login-container h2, #register-container h2 {
+.auth-container h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #4a90e2;
+    color: var(--primary-accent);
+    margin-bottom: 0.5rem;
 }
 
-#login-container div, #register-container div {
-    margin-bottom: 15px;
-}
-
-#login-container label, #register-container label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-#login-container input[type="text"],
-#login-container input[type="password"],
-#register-container input[type="text"],
-#register-container input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s;
-}
-
-#login-container input[type="text"]:focus,
-#login-container input[type="password"]:focus,
-#register-container input[type="text"]:focus,
-#register-container input[type="password"]:focus {
-    border-color: #4a90e2;
-    outline: none;
-}
-
-#login-container button[type="submit"],
-#register-container button[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-top: 15px;
-}
-
-#login-container button[type="submit"]:hover,
-#register-container button[type="submit"]:hover {
-    background-color: #3b78c0;
-}
-
-#login-container p, #register-container p {
+.auth-container .subtitle {
     text-align: center;
-    margin-top: 15px;
-    color: #777;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 0;
     font-size: 0.9rem;
 }
 
-#login-container a, #register-container a {
-    color: #4a90e2;
+.auth-switch a {
+    color: var(--primary-accent);
     text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s, text-decoration 0.2s;
 }
 
-#login-container a:hover, #register-container a:hover {
+/* EFEITO HOVER PARA LINKS DE AUTENTICAÇÃO */
+.auth-switch a:hover {
+    color: var(--primary-accent-hover);
     text-decoration: underline;
 }
 
-#logout-button {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#logout-button:hover {
-    background-color: #c9302c;
-}
-
-.message {
-    margin-top: 10px;
-    padding: 10px;
+/* DESTAQUE PARA O LINK DE VISITANTE */
+.guest-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.6rem 1rem;
+    background-color: var(--bg-surface-hover);
     border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* COMPONENTES GERAIS */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* CENTRALIZAÇÃO DOS BOTÕES DE LOGIN/REGISTRO */
+.form-group-center {
+    text-align: center;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
 }
 
-.anki-study {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary { background-color: var(--primary-accent); color: var(--bg-dark); }
+.btn-primary:hover { background-color: var(--primary-accent-hover); }
+.btn-secondary { background-color: var(--bg-surface-hover); color: var(--text-primary); }
+.btn-secondary:hover { background-color: var(--border-color); }
+.btn-success { background-color: var(--success); color: white; }
+.btn-warning { background-color: var(--warning); color: var(--bg-dark); }
+.btn-danger { background-color: var(--danger); color: white; }
+
+.message {
+
+    border-radius: 4px;
     text-align: center;
 }
 
-.anki-card {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
+/* APLICAÇÃO PRINCIPAL */
+.app-header {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: var(--bg-surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    color: var(--primary-accent);
+}
+
+#main-content {
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* TELA DE ESTUDO */
+.study-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 30px;
-    margin-bottom: 20px;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
     text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.anki-card-question {
-    font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 20px;
+.study-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.anki-card-answer {
-    font-size: 1rem;
-    color: #666;
-    margin-top: 20px;
+#grade-buttons {
+    display: flex;
+    gap: 1rem;
 }
 
-.anki-buttons button {
-    padding: 10px 20px;
-    margin: 0 10px;
-    border: none;
-    border-radius: 5px;
+/* TELA DE ADICIONAR CARD */
+.tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 1rem 1.5rem;
     cursor: pointer;
-    font-weight: bold;
-}
-
-.wrong-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.correct-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#show-answer-btn, #next-card-btn {
-    padding: 10px 20px;
-    background-color: #4a90e2;
-    color: white;
+    background-color: transparent;
+    color: var(--text-secondary);
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    border-bottom: 3px solid transparent;
     font-size: 1rem;
-    font-weight: bold;
-    margin-top: 10px;
 }
 
-#anki-message {
-    margin-top: 20px;
-    font-weight: bold;
+.tab-btn.active {
+    color: var(--primary-accent);
+    border-bottom-color: var(--primary-accent);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* BANNER DE VISITANTE */
+.guest-banner {
+    background-color: var(--warning);
+    color: var(--bg-dark);
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: 500;
+}
+
+.guest-banner a {
+    color: var(--bg-dark);
+    font-weight: 700;
+}
+
+/* CONTEÚDO MARKDOWN */
+.content code {
+    font-family: var(--font-code);
+    background-color: var(--bg-dark);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.content pre {
+    background-color: var(--bg-dark);
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--bg-surface);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid var(--border-color);
 }

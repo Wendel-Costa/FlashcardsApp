@@ -4,118 +4,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <title>Flash Cards</title>
+    <title>CardTech Flashcards</title>
 </head>
 
 <body>
 
-    <header class="header">
-        <p>App de flash cards</p>
-    </header>
+    <div id="guest-banner" class="guest-banner" style="display: none;">
+        <p>Você está no Modo de Demonstração. Seus cards não serão salvos. <a href="#" id="guest-exit-link">Sair</a></p>
+    </div>
 
-    <section class="login">
-        <div id="login-container">
-            <h2>Login</h2>
-            <form id="login-form">
-                <div>
-                    <label for="login-username">Nome de Usuário:</label>
-                    <input type="text" id="login-username" name="username" required>
+    <section id="auth-view" class="view active-view">
+        <div class="auth-container">
+            <div id="login-container">
+                <h2>CardTech</h2>
+                <p class="subtitle">Faça login para continuar</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Nome de Usuário</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <div class="form-group form-group-center">
+                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    </div>
+                    <div id="login-message" class="message"></div>
+                </form>
+                <div class="auth-switch">
+                    <p>Não tem uma conta? <a href="#" id="show-register-link">Registre-se</a></p>
+                    <a href="#" id="guest-mode-link" class="guest-link">Teste como Visitante</a>
                 </div>
-                <div>
-                    <label for="login-password">Senha:</label>
-                    <input type="password" id="login-password" name="password" required>
-                </div>
-                <button type="submit">Entrar</button>
-                <p>Não tem uma conta? <a href="#" id="show-register-form">Registre-se</a></p>
-                <div id="login-message" class="message"></div>
-            </form>
-        </div>
+            </div>
 
-        <div id="register-container" style="display: none;">
-            <h2>Registro</h2>
-            <form id="register-form">
-                <div>
-                    <label for="register-username">Nome de Usuário:</label>
-                    <input type="text" id="register-username" name="username" required>
+            <div id="register-container" style="display: none;">
+                <h2>Criar Conta</h2>
+                <p class="subtitle">Comece a sua jornada de aprendizado</p>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">Nome de Usuário</label>
+                        <input type="text" id="register-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <div class="form-group form-group-center">
+                        <button type="submit" class="btn btn-primary">Registrar</button>
+                    </div>
+                    <div id="register-message" class="message"></div>
+                </form>
+                <div class="auth-switch">
+                    <p>Já tem uma conta? <a href="#" id="show-login-link">Faça login</a></p>
                 </div>
-                <div>
-                    <label for="register-password">Senha:</label>
-                    <input type="password" id="register-password" name="password" required>
-                </div>
-                <button type="submit">Registrar</button>
-                <p>Já tem uma conta? <a href="#" id="show-login-form">Faça login</a></p>
-                <div id="register-message" class="message"></div>
-            </form>
+            </div>
         </div>
     </section>
 
-    <main class="main" style="display: none;">
-        <section class="main_input">
-            <div class="main_input_opcoes">
-                <label for="pergunta">Pergunta:</label>
-                <input type="text" id="pergunta" name="pergunta">
+    <section id="app-view" class="view">
+        <header class="app-header">
+            <h1>CardTech</h1>
+            <div class="user-menu">
+                <span id="username-display"></span>
+                <button id="logout-button" class="btn btn-secondary">Sair</button>
             </div>
+        </header>
 
-            <div class="main_input_opcoes">
-                <label for="tag">Tag:</label>
-                <input type="text" id="tag" name="tag">
-            </div>
-
-            <div class="main_input_opcoes">
-                <label for="detalhes">Nível de detalhes:</label>
-                <div id="detalhes">
-                    <label>
-                        <input type="radio" name="nivelDetalhe" value="basico" checked> Básico
-                    </label>
-                    <label>
-                        <input type="radio" name="nivelDetalhe" value="intermediario"> Intermediário
-                    </label>
-                    <label>
-                        <input type="radio" name="nivelDetalhe" value="detalhado"> Detalhado
-                    </label>
-                </div>
-            </div>
-
-            <div class="main_input_opcoes">
-                <label for="tom">Tom da resposta:</label>
-                <select id="tom" name="tom">
-                    <option value="neutro" selected>Neutro</option>
-                    <option value="formal">Formal</option>
-                    <option value="informal">Informal</option>
-                    <option value="conciso">Conciso</option>
-                    <option value="detalhado">Detalhado</option>
-                </select>
-            </div>
-
-            <button type="button" id="botaoGerarCard">Gerar Flashcards</button>
-            <button type="button" id="start-anki-study">Iniciar Estudo Anki</button>
-        </section>
-
-        <section class="main_output"></section>
-
-        <section class="anki-study" style="display: none;">
-            <h2>Estudo Anki</h2>
-            <div class="anki-card">
-                <div class="anki-card-question">
-                    </div>
-                <button id="show-answer-btn">Mostrar Resposta</button>
-                <div class="anki-card-answer" style="display: none;">
-                    <div class="anki-buttons">
-                        <button class="wrong-btn">Errei</button>
-                        <button class="correct-btn">Acertei</button>
+        <main id="main-content">
+            <div id="deck-list-view" class="main-view active-view">
+                <div class="view-header">
+                    <h2>Meus Baralhos</h2>
+                    <div class="header-actions">
+                        <button id="add-card-btn" class="btn btn-primary">Adicionar Card</button>
+                        <button id="start-study-btn" class="btn btn-success">Estudar Agora</button>
                     </div>
                 </div>
+                <div id="deck-list-container" class="deck-list">
+                    </div>
             </div>
-            <button id="next-card-btn" style="display: none;">Próximo Card</button>
-            <p id="anki-message"></p>
-            <button id="back-to-create-btn">Voltar para Criar</button>
-        </section>
-    </main>
 
-    <button id="logout-button" style="display: none;">Sair</button>
+            <div id="add-card-view" class="main-view">
+                 <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="manual-tab">Criar Manualmente</button>
+                    <button class="tab-btn" data-tab="ia-single-tab">Gerar com IA</button>
+                    <button class="tab-btn" data-tab="ia-bulk-tab">Gerar Baralho com IA</button>
+                </div>
+
+                <div id="manual-tab" class="tab-content active">
+                    <h3>Criar Card Manualmente</h3>
+                    <form id="manual-card-form">
+                        <div class="form-group">
+                            <label for="manual-pergunta">Pergunta (suporta Markdown)</label>
+                            <textarea id="manual-pergunta" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-resposta">Resposta (suporta Markdown)</label>
+                            <textarea id="manual-resposta" rows="3" required></textarea>
+                        </div>
+                         <div class="form-group">
+                            <label for="manual-tag">Tag (Baralho)</label>
+                            <input type="text" id="manual-tag" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Card</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="ia-single-tab" class="tab-content">
+                    <h3>Gerar um Card com IA</h3>
+                    <form id="ia-single-form">
+                         <div class="form-group">
+                            <label for="ia-pergunta">Tópico ou Pergunta</label>
+                            <input type="text" id="ia-pergunta" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="ia-single-tag">Tag (Baralho)</label>
+                            <input type="text" id="ia-single-tag" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Gerar Card</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="ia-bulk-tab" class="tab-content">
+                    <h3>Gerar Baralho com IA</h3>
+                     <form id="ia-bulk-form">
+                         <div class="form-group">
+                            <label for="ia-bulk-topico">Tópico Principal</label>
+                            <input type="text" id="ia-bulk-topico" required placeholder="Ex: Segunda Guerra Mundial">
+                        </div>
+                         <div class="form-group">
+                            <label for="ia-bulk-tag">Nome do Baralho (Tag)</label>
+                            <input type="text" id="ia-bulk-tag" required placeholder="Ex: História">
+                        </div>
+                         <div class="form-group">
+                            <label for="ia-bulk-quantidade">Número de Cards</label>
+                            <input type="number" id="ia-bulk-quantidade" min="3" max="20" value="5" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Gerar Baralho</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="generation-message" class="message"></div>
+            </div>
+
+            <div id="study-view" class="main-view">
+                <div class="study-card">
+                    <div id="study-card-front" class="card-face">
+                        <div id="card-question-content" class="content"></div>
+                    </div>
+                    <div id="study-card-back" class="card-face" style="display: none;">
+                        <div id="card-answer-content" class="content"></div>
+                    </div>
+                </div>
+                <div class="study-actions">
+                    <button id="show-answer-btn" class="btn btn-primary">Mostrar Resposta</button>
+                    <div id="grade-buttons" style="display: none;">
+                        <button class="btn btn-danger" data-quality="0">Errei</button>
+                        <button class="btn btn-warning" data-quality="3">Bom</button>
+                        <button class="btn btn-success" data-quality="5">Fácil</button>
+                    </div>
+                </div>
+                 <div id="study-message" class="message"></div>
+            </div>
+
+        </main>
+    </section>
+
+    <div id="edit-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Editar Card</h3>
+            <form id="edit-card-form">
+                <input type="hidden" id="edit-card-id">
+                <div class="form-group">
+                    <label for="edit-pergunta">Pergunta</label>
+                    <textarea id="edit-pergunta" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-resposta">Resposta</label>
+                    <textarea id="edit-resposta" rows="4" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script type="module" src="js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>
 
 </html>
