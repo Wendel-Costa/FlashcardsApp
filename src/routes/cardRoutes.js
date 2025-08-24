@@ -7,7 +7,7 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get("/", CardController.getCards);
-/*routes.get("/cards/user/:id", CardController.listarCardsPorUsuario);*/
+router.get("/review-queue", CardController.getReviewQueue);
 router.get("/:id", CardController.getCardById);
 router.post("/", CardController.createCard);
 router.post("/generate-text", CardController.generateCardByAI);

@@ -108,15 +108,25 @@ class CardController {
     static async getCards(req, res) {
         try {
             const userId = req.userId; 
-            const cardList = await Card.find({ 
-                owner: userId,
-                nextReviewDate: { $lte: new Date() } // $lte significa menor ou igal à
-            });
+            const cardList = await Card.find({ owner: userId }).sort({ _id: -1 });
             res.status(200).json(cardList);
         } catch (error) {
             res.status(500).json({ message: `${error.message} - failed to list cards` });
         }
     }
+
+    static async getReviewQueue(req, res) {
+        try {
+            const userId = req.userId;
+            const reviewList = await Card.find({ 
+                owner: userId,
+                nextReviewDate: { $lte: new Date() }
+            });
+            res.status(200).json(reviewList);
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to get review queue` });
+        }
+    }   
 
     static async getCardsByUser(req, res) {
         try {

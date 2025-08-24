@@ -1,342 +1,295 @@
-const API_BASE_URL = '/api';
-const URL_CARDS = `${API_BASE_URL}/cards`;
-const URL_CRIAR_CARD = `${API_BASE_URL}/cards/gerartexto`;
-const URL_REGISTER = `${API_BASE_URL}/users/register`;
-const URL_LOGIN = `${API_BASE_URL}/users/login`;
+//  constantes
 
-const loginContainer = document.getElementById('login-container');
-const registerContainer = document.getElementById('register-container');
-const showRegisterFormLink = document.getElementById('show-register-form');
-const showLoginFormLink = document.getElementById('show-login-form');
+const API_BASE_URL = '/api'; 
+let state = {
+    authToken: null,
+    isGuest: false,
+    allCards: [],
+    studyQueue: [],
+    currentStudyCardIndex: 0,
+    username: ''
+};
+
+/* ELEMENTOS DO DOM */
+
+// Views
+const authView = document.getElementById('auth-view');
+const appView = document.getElementById('app-view');
+const deckListView = document.getElementById('deck-list-view');
+const addCardView = document.getElementById('add-card-view');
+const studyView = document.getElementById('study-view');
+
+// Auth
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
+const loginContainer = document.getElementById('login-container');
+const registerContainer = document.getElementById('register-container');
+const showRegisterLink = document.getElementById('show-register-link');
+const showLoginLink = document.getElementById('show-login-link');
+const guestModeLink = document.getElementById('guest-mode-link');
 const loginMessage = document.getElementById('login-message');
 const registerMessage = document.getElementById('register-message');
-const mainContent = document.querySelector('.main');
+
+// App Shell
 const logoutButton = document.getElementById('logout-button');
-const mainOutput = document.querySelector('.main_output');
-const generateCardButton = document.getElementById('botaoGerarCard');
-const startAnkiStudyButton = document.getElementById('start-anki-study');
-const ankiStudySection = document.querySelector('.anki-study');
-const ankiQuestion = document.querySelector('.anki-card-question');
-const showAnswerButton = document.getElementById('show-answer-btn');
-const ankiAnswer = document.querySelector('.anki-card-answer');
-const wrongButton = document.querySelector('.wrong-btn');
-const correctButton = document.querySelector('.correct-btn');
-const nextCardButton = document.getElementById('next-card-btn');
-const ankiMessage = document.getElementById('anki-message');
-const backToCreateButton = document.getElementById('back-to-create-btn');
+const usernameDisplay = document.getElementById('username-display');
+const guestBanner = document.getElementById('guest-banner');
+const guestExitLink = document.getElementById('guest-exit-link');
 
-let authToken = localStorage.getItem('authToken');
-let currentCardIndex = 0;
-let studyCards = [];
-let flashcards = [];
+// Deck List View
+const deckListContainer = document.getElementById('deck-list-container');
+const addCardBtn = document.getElementById('add-card-btn');
+const startStudyBtn = document.getElementById('start-study-btn');
 
-function updateAuthUI() {
-    const loginSection = document.querySelector('.login');
-    if (authToken) {
-        loginSection.style.display = 'none';
-        registerContainer.style.display = 'none';
-        mainContent.style.display = 'block';
-        logoutButton.style.display = 'block';
-    } else {
-        loginSection.style.display = 'flex';
-        registerContainer.style.display = 'none';
-        mainContent.style.display = 'none';
-        logoutButton.style.display = 'none';
-    }
-}
+// Add Card View
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+const manualCardForm = document.getElementById('manual-card-form');
+const iaSingleForm = document.getElementById('ia-single-form');
+const iaBulkForm = document.getElementById('ia-bulk-form');
+const cancelAddButtons = document.querySelectorAll('.cancel-add-btn');
+const generationMessage = document.getElementById('generation-message');
 
-async function registerUser(event) {
-    event.preventDefault();
-    const usernameInput = document.getElementById('register-username');
-    const passwordInput = document.getElementById('register-password');
-    const username = usernameInput.value;
-    const password = passwordInput.value;
+// Study View
+const studyCardFront = document.getElementById('study-card-front');
+const studyCardBack = document.getElementById('study-card-back');
+const cardQuestionContent = document.getElementById('card-question-content');
+const cardAnswerContent = document.getElementById('card-answer-content');
+const showAnswerBtn = document.getElementById('show-answer-btn');
+const gradeButtons = document.getElementById('grade-buttons');
+const studyMessage = document.getElementById('study-message');
 
-    registerMessage.textContent = 'Registrando...';
-    registerMessage.className = 'message';
+// Edit Modal
+const editModal = document.getElementById('edit-modal');
+const editCardForm = document.getElementById('edit-card-form');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
 
-    try {
-        const response = await fetch(URL_REGISTER, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nome: username, senha: password })
-        });
+/*      */
 
-        const data = await response.json();
 
-        if (response.status === 201) {
-            registerMessage.textContent = data.message;
-            registerMessage.className = 'message success';
-            loginContainer.style.display = 'block';
-            registerContainer.style.display = 'none';
-        } else {
-            registerMessage.textContent = data.message;
-            registerMessage.className = 'message error';
-        }
-    } catch (error) {
-        console.error('Erro ao registrar usuário:', error);
-        registerMessage.textContent = 'Erro ao registrar usuário. Tente novamente.';
-        registerMessage.className = 'message error';
-    }
-}
+// API FETHC 
 
-async function loginUser(event) {
-    event.preventDefault();
-    const usernameInput = document.getElementById('login-username');
-    const passwordInput = document.getElementById('login-password');
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-
-    loginMessage.textContent = 'Entrando...';
-    loginMessage.className = 'message';
-
-    try {
-        const response = await fetch(URL_LOGIN, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nome: username, senha: password })
-        });
-
-        const data = await response.json();
-
-        if (response.status === 200) {
-            authToken = data.token;
-            localStorage.setItem('authToken', authToken);
-            loginMessage.textContent = data.message;
-            loginMessage.className = 'message success';
-            updateAuthUI();
-            chamarApi();
-        } else {
-            loginMessage.textContent = data.message;
-            loginMessage.className = 'message error';
-        }
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        loginMessage.textContent = 'Erro ao fazer login. Tente novamente.';
-        loginMessage.className = 'message error';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('authToken');
-    authToken = null;
-    updateAuthUI();
-    mainOutput.innerHTML = '';
-    ankiStudySection.style.display = 'none';
-}
-
-async function chamarApi() {
-    if (!authToken) {
-        mainOutput.innerHTML = '<p class="error">Você precisa estar logado para ver seus flashcards.</p>';
-        return;
-    }
-
-    mainOutput.innerHTML = '<p class="loading">Carregando seus flashcards...</p>';
-
-    try {
-        const resp = await fetch(URL_CARDS, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        });
-
-        if (resp.status === 200) {
-            flashcards = await resp.json();
-            console.log(flashcards);
-            exibirFlashcards(flashcards);
-        } else if (resp.status === 401) {
-            mainOutput.innerHTML = '<p class="error">Sua sessão expirou. Por favor, faça login novamente.</p>';
-            logout();
-        } else {
-            const errorData = await resp.json();
-            mainOutput.innerHTML = `<p class="error">Erro ao carregar flashcards: ${errorData.message || 'Erro desconhecido'}</p>`;
-        }
-    } catch (error) {
-        console.error('Erro ao chamar a API de cards:', error);
-        mainOutput.innerHTML = '<p class="error">Erro ao carregar flashcards. Tente novamente.</p>';
-    }
-}
-
-function exibirFlashcards(cards) {
-    const outputSection = document.querySelector('.main_output');
-    outputSection.innerHTML = '';
-
-    if (cards && cards.length > 0) {
-        cards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.classList.add('flashcard');
-            cardElement.innerHTML = `
-                <h3>${card.pergunta}</h3>
-                <p><strong>Resposta:</strong> ${card.resposta}</p>
-                <p><strong>Tag:</strong> ${card.tag}</p>
-            `;
-            outputSection.appendChild(cardElement);
-        });
-    } else {
-        outputSection.innerHTML = '<p>Nenhum flashcard encontrado. Crie o seu primeiro!</p>';
-    }
-}
-
-async function gerarFlashcardIA() {
-    if (!authToken) {
-        alert('Você precisa estar logado para gerar flashcards.');
-        return;
-    }
-
-    const detalhe = document.querySelector('input[name="nivelDetalhe"]:checked').value;
-    const pergunta = document.querySelector('#pergunta').value;
-    const tag = document.querySelector('#tag').value;
-    const tom = document.querySelector('#tom').value;
-
-    if (!pergunta || !tag) {
-        alert('Preencha todos os campos!');
-        return;
-    }
-
-    const dados = {
-        detalhe,
-        pergunta,
-        tag,
-        tom
+async function apiFetch(endpoint, options = {}) {
+    const { body, ...restOptions } = options;
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
     };
 
-    mainOutput.innerHTML = '<p class="loading">Gerando flashcard...</p>';
+    if (state.authToken) {
+        headers['Authorization'] = `Bearer ${state.authToken}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...restOptions,
+        headers,
+        body: body ? JSON.stringify(body) : null,
+    });
+
+    if (response.status === 401) {
+        handleLogout();
+        return;
+    }
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'An API error occurred.');
+    }
+
+    return response.json();
+}
+
+
+// VIEW
+
+function showView(viewToShow) {
+    [authView, appView].forEach(view => view.classList.remove('active-view'));
+    viewToShow.classList.add('active-view');
+}
+
+function showMainView(viewToShow) {
+    [deckListView, addCardView, studyView].forEach(view => view.classList.remove('active-view'));
+    viewToShow.classList.add('active-view');
+}
+
+//AUTHENTICATION 
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const username = loginForm.querySelector('#login-username').value;
+    const password = loginForm.querySelector('#login-password').value;
 
     try {
-        const resp = await fetch(URL_CRIAR_CARD, {
+        const data = await apiFetch('/users/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify(dados)
+            body: { username, password }
         });
+        
+        state.authToken = data.token;
+        state.username = username;
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('username', username);
 
-        if (resp.status === 201) {
-            const resposta = await resp.json();
-            exibirCard(resposta.card);
-            flashcards.unshift(resposta.card);
-        } else if (resp.status === 401) {
-            mainOutput.innerHTML = '<p class="error">Sua sessão expirou. Por favor, faça login novamente.</p>';
-            logout();
-        } else {
-            const erro = await resp.json();
-            mainOutput.innerHTML = `<p class="error">Erro ao criar o flashcard: ${erro.message || 'Erro desconhecido'}</p>`;
-        }
+        await initializeApp();
+
     } catch (error) {
-        console.error('Erro ao enviar dados para o backend:', error);
-        mainOutput.innerHTML = '<p class="error">Erro ao criar o flashcard. Tente novamente.</p>';
+        loginMessage.textContent = error.message;
     }
 }
 
-function exibirCard(card) {
-    const mainOutput = document.querySelector('.main_output');
-    const cardElement = document.createElement('div');
-    cardElement.classList.add('flashcard');
-    cardElement.innerHTML = `
-        <h3>${card.pergunta}</h3>
-        <p><strong>Resposta:</strong> ${card.resposta}</p>
-        <p><strong>Tag:</strong> ${card.tag}</p>
-    `;
-    mainOutput.prepend(cardElement);
-    if (mainOutput.querySelector('.loading')) {
-        mainOutput.removeChild(mainOutput.querySelector('.loading'));
+async function handleRegister(event) {
+    event.preventDefault();
+    const username = registerForm.querySelector('#register-username').value;
+    const password = registerForm.querySelector('#register-password').value;
+
+    try {
+        const data = await apiFetch('/users/register', {
+            method: 'POST',
+            body: { username, password }
+        });
+        
+        registerMessage.textContent = data.message;
+        registerContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+
+    } catch (error) {
+        registerMessage.textContent = error.message;
     }
 }
+
+function handleLogout() {
+    state.authToken = null;
+    state.username = '';
+    state.isGuest = false;
+    localStorage.clear();
+    
+    guestBanner.style.display = 'none';
+    showView(authView);
+}
+
+// Modo visitante
+
+function handleGuestMode() {
+    state.isGuest = true;
+    guestBanner.style.display = 'block';
+    showView(appView);
+    renderDecks([
+        { _id: 'g1', question: 'O que é HTML?', answer: 'É uma linguagem de marcação para criar páginas web.', tag: 'Tecnologia' },
+        { _id: 'g2', question: 'Qual a capital do Brasil?', answer: 'Brasília.', tag: 'Geografia' }
+    ]);
+}
+
+// Carregar cards
+
+async function fetchAndRenderDecks() {
+    if(state.isGuest) return;
+
+    try {
+        state.allCards = await apiFetch('/cards');
+        renderDecks(state.allCards);
+    } catch (error) {
+        console.error("Failed to fetch decks:", error);
+        deckListContainer.innerHTML = `<p>Error loading decks.</p>`;
+    }
+}
+
+function renderDecks(cards) {
+    if (cards.length === 0) {
+        deckListContainer.innerHTML = `<p>Nenhum baralho encontrado. Crie seu primeiro card!</p>`;
+        return;
+    }
+
+    const decks = cards.reduce((acc, card) => {
+        const tag = card.tag || 'Sem Categoria';
+        if (!acc[tag]) {
+            acc[tag] = { total: 0, new: 0, review: 0 };
+        }
+        acc[tag].total++;
+        if (new Date(card.nextReviewDate) <= new Date()) {
+            acc[tag].review++;
+        }
+        if (card.status === 'new') {
+            acc[tag].new++;
+        }
+        return acc;
+    }, {});
+
+    deckListContainer.innerHTML = Object.entries(decks).map(([tagName, counts]) => `
+        <div class="deck-item">
+            <h3>${tagName}</h3>
+            <div class="deck-stats">
+                <span>Total: ${counts.total}</span>
+                <span>Novos: ${counts.new}</span>
+                <span>Revisar: ${counts.review}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+// Inicialização
+
+async function initializeApp() {
+    showView(appView);
+    usernameDisplay.textContent = state.username;
+    await fetchAndRenderDecks();
+    showMainView(deckListView);
+}
+
+function checkInitialAuthState() {
+    const token = localStorage.getItem('authToken');
+    const username = localStorage.getItem('username');
+    if (token && username) {
+        state.authToken = token;
+        state.username = username;
+        initializeApp();
+    } else {
+        showView(authView);
+    }
+}
+
+// --- EVENT LISTENERS ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    updateAuthUI();
-    if (authToken) {
-        chamarApi();
-    }
-});
+    
+    // Auth
+    loginForm.addEventListener('submit', handleLogin);
+    registerForm.addEventListener('submit', handleRegister);
+    logoutButton.addEventListener('click', handleLogout);
+    guestModeLink.addEventListener('click', handleGuestMode);
+    guestExitLink.addEventListener('click', handleLogout);
 
-showRegisterFormLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginContainer.style.display = 'none';
-    registerContainer.style.display = 'block';
-});
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
+    });
+    
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+    });
 
-showLoginFormLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    registerContainer.style.display = 'none';
-    loginContainer.style.display = 'block';
-});
+    // Main
+    addCardBtn.addEventListener('click', () => showMainView(addCardView));
+    
+    cancelAddButtons.forEach(btn => {
+        btn.addEventListener('click', () => showMainView(deckListView));
+    });
 
-loginForm.addEventListener('submit', loginUser);
-registerForm.addEventListener('submit', registerUser);
-logoutButton.addEventListener('click', logout);
-generateCardButton.addEventListener('click', gerarFlashcardIA);
+    // Add Card
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
+    });
 
-// Lógica para a seção de estudo Anki
-startAnkiStudyButton.addEventListener('click', () => {
-    if (flashcards && flashcards.length > 0) {
-        studyCards = [...flashcards];
-        currentCardIndex = 0;
-        ankiStudySection.style.display = 'block';
-        mainOutput.style.display = 'none';
-        logoutButton.style.display = 'none';
-        document.querySelector('.main_input').style.display = 'none';
-        showCard();
-    } else {
-        ankiMessage.textContent = 'Nenhum flashcard encontrado para estudar.';
-    }
-});
-
-function showCard() {
-    if (currentCardIndex < studyCards.length) {
-        const card = studyCards[currentCardIndex];
-        ankiQuestion.textContent = card.pergunta;
-        ankiAnswer.style.display = 'none';
-        showAnswerButton.style.display = 'block';
-        wrongButton.style.display = 'none';
-        correctButton.style.display = 'none';
-        nextCardButton.style.display = 'none';
-        ankiMessage.textContent = '';
-    } else {
-        ankiMessage.textContent = 'Você revisou todos os flashcards!';
-        ankiQuestion.textContent = '';
-        ankiAnswer.style.display = 'none';
-        showAnswerButton.style.display = 'none';
-        nextCardButton.style.display = 'none';
-    }
-}
-
-showAnswerButton.addEventListener('click', () => {
-    const card = studyCards[currentCardIndex];
-    ankiAnswer.querySelector('.anki-buttons').style.display = 'flex';
-    ankiAnswer.querySelector('div:first-child').textContent = card.resposta;
-    ankiAnswer.style.display = 'block';
-    showAnswerButton.style.display = 'none';
-    wrongButton.style.display = 'inline-block';
-    correctButton.style.display = 'inline-block';
-    nextCardButton.style.display = 'block';
-});
-
-nextCardButton.addEventListener('click', () => {
-    currentCardIndex++;
-    showCard();
-});
-
-wrongButton.addEventListener('click', () => {
-    currentCardIndex++;
-    showCard();
-});
-
-correctButton.addEventListener('click', () => {
-    currentCardIndex++;
-    showCard();
-});
-
-backToCreateButton.addEventListener('click', () => {
-    ankiStudySection.style.display = 'none';
-    document.querySelector('.main_input').style.display = 'block';
-    mainOutput.style.display = 'block';
-    logoutButton.style.display = 'block';
+    // Check inicial
+    checkInitialAuthState();
 });
