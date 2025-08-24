@@ -2,11 +2,75 @@ import card from "../models/Card.js";
 import user from "../models/User.js";
 import gerarTexto from "../api/geminiApp.js";
 
+function adicionarDias(data, dias) {
+    const resultado = new Date(data);
+    resultado.setDate(resultado.getDate() + dias);
+    return resultado;
+}
+
+function adicionarMinutos(data, minutos) {
+    const resultado = new Date(data);
+    resultado.setTime(resultado.getTime() + minutos * 60000); // 60000 milissegundos em um minuto
+    return resultado;
+}
+
 class CardController {
+    
+    static async revisarCard(req, res) {
+        try {
+            const cardId = req.params.id;
+            
+            const { qualidade } = req.body; // Qualidade: 0 (Errou), 3 (Bom), 5 (Fácil)
+
+            const cardParaRevisar = await card.findById(cardId);
+
+            if (!cardParaRevisar || cardParaRevisar.dono.toString() !== req.userId) {
+                return res.status(403).json({ message: "Não autorizado a revisar este card." });
+            }
+
+            if (qualidade < 3) {
+                cardParaRevisar.intervalo = 0;
+                cardParaRevisar.estado = 'aprendendo';
+                cardParaRevisar.proximaRevisao = adicionarMinutos(new Date(), 10); 
+
+            } else {
+                let novoIntervalo;
+                let novoFatorFacilidade = cardParaRevisar.fatorFacilidade + (0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02)); // cálculo da repetição espaçada
+
+                if (novoFatorFacilidade < 1.3) {
+                    novoFatorFacilidade = 1.3;
+                } // não pode ser menor que 1.3 (pela regra geral da repetição espaçada)
+                
+                cardParaRevisar.fatorFacilidade = novoFatorFacilidade;
+                
+                if (cardParaRevisar.estado === 'aprendendo' || cardParaRevisar.intervalo === 0) {
+                    novoIntervalo = 1;
+                } else if (cardParaRevisar.intervalo === 1) {
+                    novoIntervalo = 6;
+                } else {
+                    novoIntervalo = Math.ceil(cardParaRevisar.intervalo * cardParaRevisar.fatorFacilidade);
+                }
+                
+                cardParaRevisar.intervalo = novoIntervalo;
+                cardParaRevisar.estado = 'revisando';
+                cardParaRevisar.proximaRevisao = adicionarDias(new Date(), novoIntervalo);
+            }
+
+            await cardParaRevisar.save();
+            res.status(200).json({ message: "Card revisado com sucesso", card: cardParaRevisar });
+
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao revisar o card` });
+        }
+    }
+
     static async listarCards(req, res) {
         try {
-            const userId = req.userId; // Obtém o ID do usuário autenticado do middleware
-            const listaCards = await card.find({ dono: userId }); // Busca apenas os cards do usuário logado
+            const userId = req.userId; 
+            const listaCards = await card.find({ 
+                dono: userId,
+                proximaRevisao: { $lte: new Date() } // $lte significa menor ou igal à
+            });
             res.status(200).json(listaCards);
         } catch (erro) {
             res.status(500).json({ message: `${erro.message} - falha ao listar cards` });
@@ -22,7 +86,6 @@ class CardController {
                 return res.status(404).json({ message: "Usuário não encontrado" });
             }
 
-            // Adicione esta verificação para garantir que o usuário autenticado só veja seus próprios cards
             if (req.userId !== userId) {
                 return res.status(403).json({ message: "Não autorizado a listar cards deste usuário." });
             }
@@ -38,9 +101,8 @@ class CardController {
     static async listarCardPorId(req, res) {
         try {
             const id = req.params.id;
-            const cardEncontrado = await card.findById(id).populate('dono');
+            const cardEncontrado = await card.findById(id);
 
-            // Garante que o card pertence ao usuário autenticado
             if (cardEncontrado && cardEncontrado.dono.toString() !== req.userId) {
                 return res.status(403).json({ message: "Não autorizado a acessar este card." });
             }
@@ -68,7 +130,7 @@ class CardController {
     }
 
     static async gerarCardPorIA(req, res) {
-        const {detalhe, tom } = req.body;
+        const { detalhe, tom } = req.body;
         try {
             const userId = req.userId;
             req.body.dono = userId;
