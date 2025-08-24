@@ -11,6 +11,7 @@ router.get("/", CardController.listarCards);
 router.get("/:id", CardController.listarCardPorId);
 router.post("/", CardController.cadastrarCard);
 router.post("/gerartexto", CardController.gerarCardPorIA);
+router.post("/gerarbaralho", CardController.gerarBaralhoPorIA);
 router.post("/:id/revisar", CardController.revisarCard);
 router.put("/:id", CardController.atualizarCard);
 router.delete("/:id", CardController.excluirCard);

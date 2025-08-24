@@ -1,6 +1,6 @@
 import card from "../models/Card.js";
 import user from "../models/User.js";
-import gerarTexto from "../api/geminiApp.js";
+import {gerarTexto, gerarBaralhoComIA} from "../api/geminiApp.js";
 
 function adicionarDias(data, dias) {
     const resultado = new Date(data);
@@ -10,12 +10,53 @@ function adicionarDias(data, dias) {
 
 function adicionarMinutos(data, minutos) {
     const resultado = new Date(data);
-    resultado.setTime(resultado.getTime() + minutos * 60000); // 60000 milissegundos em um minuto
+    resultado.setTime(resultado.getTime() + minutos * 60000);
     return resultado;
 }
 
 class CardController {
     
+        static async gerarBaralhoPorIA(req, res) {
+        const { topico, tag, quantidade } = req.body;
+        const userId = req.userId;
+
+        if (!topico || !tag || !quantidade) {
+            return res.status(400).json({ message: "Tópico, tag e quantidade são obrigatórios." });
+        }
+
+        try {
+            const respostaIAemTexto = await gerarBaralhoComIA(topico, quantidade);
+
+            // Correção caso a IA não gere os dados da forma correta:
+            let novosCardsData;
+            try {
+                const textoLimpo = respostaIAemTexto.replace(/```json/g, '').replace(/```/g, '').trim();
+                novosCardsData = JSON.parse(textoLimpo);
+            } catch (erro) {
+                console.error("Erro ao fazer parse do JSON da IA:", respostaIAemTexto);
+                return res.status(500).json({ message: "A IA retornou uma resposta em um formato inválido. Tente novamente." });
+            }
+            
+            // Salvar os cards:
+            const cardsParaSalvar = novosCardsData.map(c => ({
+                ...c,
+                tag: tag,
+                dono: userId,
+            }));
+
+            const cardsSalvos = await card.insertMany(cardsParaSalvar);
+
+            const idsDosCardsSalvos = cardsSalvos.map(c => c._id);
+            await user.findByIdAndUpdate(userId, { $push: { cards: { $each: idsDosCardsSalvos } } });
+
+            res.status(201).json({ message: `${quantidade} cards sobre '${topico}' criados com sucesso!`, cards: cardsSalvos });
+
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao gerar baralho com IA` });
+        }
+    }
+
+
     static async revisarCard(req, res) {
         try {
             const cardId = req.params.id;
