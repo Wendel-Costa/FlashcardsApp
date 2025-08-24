@@ -1,19 +1,19 @@
 import express from "express";
-import conectarNaDatabase from "./config/dbConnect.js";
+import connectToDatabase from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 
 import cors from "cors";
 
 
 
-const conexao = await conectarNaDatabase();
+const connection = await connectToDatabase();
 
-conexao.on("error", (erro) => {
-    console.error("Erro de conexão", erro);
+connection.on("error", (error) => {
+    console.error("Connection error", error);
 })
 
-conexao.once("open", () => {
-    console.log("Conexão com o banco feita com sucesso");
+connection.once("open", () => {
+    console.log("Database connection successful");
 })
 
 const app = express();

@@ -1,237 +1,237 @@
-import card from "../models/Card.js";
-import user from "../models/User.js";
-import {gerarTexto, gerarBaralhoComIA} from "../api/geminiApp.js";
+import Card from "../models/Card.js";
+import User from "../models/User.js";
+import { generateText, generateDeckWithAI } from "../api/geminiApp.js";
 
-function adicionarDias(data, dias) {
-    const resultado = new Date(data);
-    resultado.setDate(resultado.getDate() + dias);
-    return resultado;
+function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
 }
 
-function adicionarMinutos(data, minutos) {
-    const resultado = new Date(data);
-    resultado.setTime(resultado.getTime() + minutos * 60000);
-    return resultado;
+function addMinutes(date, minutes) {
+    const result = new Date(date);
+    result.setTime(result.getTime() + minutes * 60000);
+    return result;
 }
 
 class CardController {
     
-        static async gerarBaralhoPorIA(req, res) {
-        const { topico, tag, quantidade } = req.body;
+    static async generateDeckByAI(req, res) {
+        const { topic, tag, count } = req.body;
         const userId = req.userId;
 
-        if (!topico || !tag || !quantidade) {
-            return res.status(400).json({ message: "Tópico, tag e quantidade são obrigatórios." });
+        if (!topic || !tag || !count) {
+            return res.status(400).json({ message: "Topic, tag and count are required." });
         }
 
         try {
-            const respostaIAemTexto = await gerarBaralhoComIA(topico, quantidade);
+            const aiResponseText = await generateDeckWithAI(topic, count);
 
             // Correção caso a IA não gere os dados da forma correta:
-            let novosCardsData;
+            let newCardsData;
             try {
-                const textoLimpo = respostaIAemTexto.replace(/```json/g, '').replace(/```/g, '').trim();
-                novosCardsData = JSON.parse(textoLimpo);
-            } catch (erro) {
-                console.error("Erro ao fazer parse do JSON da IA:", respostaIAemTexto);
-                return res.status(500).json({ message: "A IA retornou uma resposta em um formato inválido. Tente novamente." });
+                const cleanText = aiResponseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                newCardsData = JSON.parse(cleanText);
+            } catch (error) {
+                console.error("Erro ao fazer parse do JSON da IA:", aiResponseText);
+                return res.status(500).json({ message: "The AI returned a response in an invalid format. Please try again." });
             }
             
             // Salvar os cards:
-            const cardsParaSalvar = novosCardsData.map(c => ({
+            const cardsToSave = newCardsData.map(c => ({
                 ...c,
                 tag: tag,
-                dono: userId,
+                owner: userId,
             }));
 
-            const cardsSalvos = await card.insertMany(cardsParaSalvar);
+            const savedCards = await Card.insertMany(cardsToSave);
 
-            const idsDosCardsSalvos = cardsSalvos.map(c => c._id);
-            await user.findByIdAndUpdate(userId, { $push: { cards: { $each: idsDosCardsSalvos } } });
+            const savedCardIds = savedCards.map(c => c._id);
+            await User.findByIdAndUpdate(userId, { $push: { cards: { $each: savedCardIds } } });
 
-            res.status(201).json({ message: `${quantidade} cards sobre '${topico}' criados com sucesso!`, cards: cardsSalvos });
+            res.status(201).json({ message: `${count} cards about '${topic}' created successfully!`, cards: savedCards });
 
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao gerar baralho com IA` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to generate deck with AI` });
         }
     }
 
 
-    static async revisarCard(req, res) {
+    static async reviewCard(req, res) {
         try {
             const cardId = req.params.id;
             
-            const { qualidade } = req.body; // Qualidade: 0 (Errou), 3 (Bom), 5 (Fácil)
+            const { quality } = req.body; // Qualidade: 0 (Errou), 3 (Bom), 5 (Fácil)
 
-            const cardParaRevisar = await card.findById(cardId);
+            const cardToReview = await Card.findById(cardId);
 
-            if (!cardParaRevisar || cardParaRevisar.dono.toString() !== req.userId) {
-                return res.status(403).json({ message: "Não autorizado a revisar este card." });
+            if (!cardToReview || cardToReview.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: "Not authorized to review this card." });
             }
 
-            if (qualidade < 3) {
-                cardParaRevisar.intervalo = 0;
-                cardParaRevisar.estado = 'aprendendo';
-                cardParaRevisar.proximaRevisao = adicionarMinutos(new Date(), 10); 
+            if (quality < 3) {
+                cardToReview.interval = 0;
+                cardToReview.status = 'learning';
+                cardToReview.nextReviewDate = addMinutes(new Date(), 10); 
 
             } else {
-                let novoIntervalo;
-                let novoFatorFacilidade = cardParaRevisar.fatorFacilidade + (0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02)); // cálculo da repetição espaçada
+                let newInterval;
+                let newEaseFactor = cardToReview.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); // cálculo da repetição espaçada
 
-                if (novoFatorFacilidade < 1.3) {
-                    novoFatorFacilidade = 1.3;
+                if (newEaseFactor < 1.3) {
+                    newEaseFactor = 1.3;
                 } // não pode ser menor que 1.3 (pela regra geral da repetição espaçada)
                 
-                cardParaRevisar.fatorFacilidade = novoFatorFacilidade;
+                cardToReview.easeFactor = newEaseFactor;
                 
-                if (cardParaRevisar.estado === 'aprendendo' || cardParaRevisar.intervalo === 0) {
-                    novoIntervalo = 1;
-                } else if (cardParaRevisar.intervalo === 1) {
-                    novoIntervalo = 6;
+                if (cardToReview.status === 'learning' || cardToReview.interval === 0) {
+                    newInterval = 1;
+                } else if (cardToReview.interval === 1) {
+                    newInterval = 6;
                 } else {
-                    novoIntervalo = Math.ceil(cardParaRevisar.intervalo * cardParaRevisar.fatorFacilidade);
+                    newInterval = Math.ceil(cardToReview.interval * cardToReview.easeFactor);
                 }
                 
-                cardParaRevisar.intervalo = novoIntervalo;
-                cardParaRevisar.estado = 'revisando';
-                cardParaRevisar.proximaRevisao = adicionarDias(new Date(), novoIntervalo);
+                cardToReview.interval = newInterval;
+                cardToReview.status = 'reviewing';
+                cardToReview.nextReviewDate = addDays(new Date(), newInterval);
             }
 
-            await cardParaRevisar.save();
-            res.status(200).json({ message: "Card revisado com sucesso", card: cardParaRevisar });
+            await cardToReview.save();
+            res.status(200).json({ message: "Card reviewed successfully", card: cardToReview });
 
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao revisar o card` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to review card` });
         }
     }
 
-    static async listarCards(req, res) {
+    static async getCards(req, res) {
         try {
             const userId = req.userId; 
-            const listaCards = await card.find({ 
-                dono: userId,
-                proximaRevisao: { $lte: new Date() } // $lte significa menor ou igal à
+            const cardList = await Card.find({ 
+                owner: userId,
+                nextReviewDate: { $lte: new Date() } // $lte significa menor ou igal à
             });
-            res.status(200).json(listaCards);
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao listar cards` });
+            res.status(200).json(cardList);
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to list cards` });
         }
     }
 
-    static async listarCardsPorUsuario(req, res) {
+    static async getCardsByUser(req, res) {
         try {
             const userId = req.params.id;
-            const usuario = await user.findById(userId);
+            const user = await User.findById(userId);
 
-            if (!usuario) {
-                return res.status(404).json({ message: "Usuário não encontrado" });
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
             }
 
             if (req.userId !== userId) {
-                return res.status(403).json({ message: "Não autorizado a listar cards deste usuário." });
+                return res.status(403).json({ message: "Not authorized to list cards for this user." });
             }
 
-            const cardsDoUsuario = await card.find({ dono: userId });
-            res.status(200).json(cardsDoUsuario);
+            const userCards = await Card.find({ owner: userId });
+            res.status(200).json(userCards);
 
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao listar cards do usuário` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to list user's cards` });
         }
     }
 
-    static async listarCardPorId(req, res) {
+    static async getCardById(req, res) {
         try {
             const id = req.params.id;
-            const cardEncontrado = await card.findById(id);
+            const foundCard = await Card.findById(id);
 
-            if (cardEncontrado && cardEncontrado.dono.toString() !== req.userId) {
-                return res.status(403).json({ message: "Não autorizado a acessar este card." });
+            if (foundCard && foundCard.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: "Not authorized to access this card." });
             }
 
-            res.status(200).json(cardEncontrado);
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na requisição do card` });
+            res.status(200).json(foundCard);
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to request card` });
         }
     }
 
-    static async cadastrarCard(req, res) {
+    static async createCard(req, res) {
         try {
             const userId = req.userId;
-            req.body.dono = userId;
+            req.body.owner = userId;
 
-            const novoCard = await card.create(req.body);
+            const newCard = await Card.create(req.body);
 
-            await user.findByIdAndUpdate(userId, { $push: { cards: novoCard._id } });
+            await User.findByIdAndUpdate(userId, { $push: { cards: newCard._id } });
 
-            res.status(201).json({ message: "Card criado com sucesso", card: novoCard });
+            res.status(201).json({ message: "Card created successfully", card: newCard });
 
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to create card` });
         }
     }
 
-    static async gerarCardPorIA(req, res) {
-        const { detalhe, tom } = req.body;
+    static async generateCardByAI(req, res) {
+        const { detailLevel, tone } = req.body;
         try {
             const userId = req.userId;
-            req.body.dono = userId;
+            req.body.owner = userId;
 
-            const respostaIA = await gerarTexto(req.body.pergunta, detalhe, tom);
+            const aiResponse = await generateText(req.body.question, detailLevel, tone);
 
-            const novoCardcomIA = {
-                pergunta: req.body.pergunta,
-                resposta: respostaIA,
+            const newCardWithAI = {
+                question: req.body.question,
+                answer: aiResponse,
                 tag: req.body.tag,
-                dono: req.body.dono
+                owner: req.body.owner
             };
 
-            const novoCard = await card.create(novoCardcomIA);
+            const newCard = await Card.create(newCardWithAI);
 
-            await user.findByIdAndUpdate(userId, { $push: { cards: novoCard._id } });
+            await User.findByIdAndUpdate(userId, { $push: { cards: newCard._id } });
 
-            res.status(201).json({ message: 'Card gerado por IA com sucesso', card: novoCard });
+            res.status(201).json({ message: 'Card generated by AI successfully', card: newCard });
 
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao cadastrar card` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to create card` });
         }
     }
 
-    static async atualizarCard(req, res) {
+    static async updateCard(req, res) {
         try {
             const id = req.params.id;
-            const cardParaAtualizar = await card.findById(id);
+            const cardToUpdate = await Card.findById(id);
 
-            if (!cardParaAtualizar || cardParaAtualizar.dono.toString() !== req.userId) {
-                return res.status(403).json({ message: "Não autorizado a atualizar este card." });
+            if (!cardToUpdate || cardToUpdate.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: "Not authorized to update this card." });
             }
 
-            await card.findByIdAndUpdate(id, req.body);
-            res.status(200).json({ message: "Card atualizado com sucesso" });
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na atualização do card` });
+            await Card.findByIdAndUpdate(id, req.body);
+            res.status(200).json({ message: "Card updated successfully" });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to update card` });
         }
     }
 
-    static async excluirCard(req, res) {
+    static async deleteCard(req, res) {
         try {
             const id = req.params.id;
-            const cardExcluido = await card.findById(id);
+            const deletedCard = await Card.findById(id);
 
-            if (!cardExcluido || cardExcluido.dono.toString() !== req.userId) {
-                return res.status(403).json({ message: "Não autorizado a excluir este card." });
+            if (!deletedCard || deletedCard.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: "Not authorized to delete this card." });
             }
 
-            await card.findByIdAndDelete(id);
+            await Card.findByIdAndDelete(id);
 
-            const usuario = await user.findById(req.userId);
-            if (usuario) {
-                usuario.cards.pull(id);
-                await usuario.save();
+            const user = await User.findById(req.userId);
+            if (user) {
+                user.cards.pull(id);
+                await user.save();
             }
 
-            res.status(200).json({ message: "Card excluído com sucesso" });
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na exclusão do card` });
+            res.status(200).json({ message: "Card deleted successfully" });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to delete card` });
         }
     }
 }

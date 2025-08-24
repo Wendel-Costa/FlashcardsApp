@@ -6,14 +6,14 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", CardController.listarCards);
+router.get("/", CardController.getCards);
 /*routes.get("/cards/user/:id", CardController.listarCardsPorUsuario);*/
-router.get("/:id", CardController.listarCardPorId);
-router.post("/", CardController.cadastrarCard);
-router.post("/gerartexto", CardController.gerarCardPorIA);
-router.post("/gerarbaralho", CardController.gerarBaralhoPorIA);
-router.post("/:id/revisar", CardController.revisarCard);
-router.put("/:id", CardController.atualizarCard);
-router.delete("/:id", CardController.excluirCard);
+router.get("/:id", CardController.getCardById);
+router.post("/", CardController.createCard);
+router.post("/generate-text", CardController.generateCardByAI);
+router.post("/generate-deck", CardController.generateDeckByAI);
+router.post("/:id/review", CardController.reviewCard);
+router.put("/:id", CardController.updateCard);
+router.delete("/:id", CardController.deleteCard);
 
 export default router;

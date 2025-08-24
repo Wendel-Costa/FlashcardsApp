@@ -2,20 +2,20 @@ import mongoose from "mongoose";
 
 const cardSchema = new mongoose.Schema({
     id: { type: mongoose.Schema.Types.ObjectId },
-    pergunta: { type: String, required: true },
-    resposta: { type: String, required: true },
+    question: { type: String, required: true },
+    answer: { type: String, required: true },
     tag: { type: String },
-    dono: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-    proximaRevisao: { type: Date, default: () => new Date() },
-    intervalo: { type: Number, default: 0 },
-    fatorFacilidade: { type: Number, default: 2.5 },
-    estado: { type: String, enum: ['novo', 'aprendendo', 'revisando'], default: 'novo' },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+    nextReviewDate: { type: Date, default: () => new Date() },
+    interval: { type: Number, default: 0 },
+    easeFactor: { type: Number, default: 2.5 },
+    status: { type: String, enum: ['new', 'learning', 'reviewing'], default: 'new' },
 
     //obs: opção de adicionar imagens no futuro
-    perguntaImagemUrl: { type: String, default: null },
-    respostaImagemUrl: { type: String, default: null }
+    questionImageUrl: { type: String, default: null },
+    answerImageUrl: { type: String, default: null }
 }, { versionKey: false });
 
-const card = mongoose.model("cards", cardSchema);
+const Card = mongoose.model("cards", cardSchema);
 
-export default card;
+export default Card;

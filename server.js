@@ -1,5 +1,5 @@
 import express from "express";
-import connectDatabase from "./src/config/dbConnect.js";
+import connectToDatabase from "./src/config/dbConnect.js";
 import routes from "./src/routes/index.js";
 import cors from 'cors';
 
@@ -10,8 +10,8 @@ app.use('/api', routes);
 
 const port = process.env.PORT || 3000;
 
-connectDatabase();
+connectToDatabase();
 
 app.listen(port, () => {
-    console.log(`servidor escutando na porta ${port}`);
+    console.log(`Server listening on port ${port}`);
 });

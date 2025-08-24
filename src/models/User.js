@@ -3,18 +3,18 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
     id: { type: mongoose.Schema.Types.ObjectId },
-    nome: { type: String, required: true, unique: true },
-    senha: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'cards' }]
 }, { versionKey: false });
 
 userSchema.pre('save', async function(next) {
-    if (this.isModified('senha')) {
-        this.senha = await bcrypt.hash(this.senha, 10);
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 10);
     }
     next();
 });
 
-const user = mongoose.model("users", userSchema);
+const User = mongoose.model("users", userSchema);
 
-export default user;
+export default User;

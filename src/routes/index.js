@@ -4,7 +4,7 @@ import cardRoutes from "./cardRoutes.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => res.status(200).send("App de flashcards 100% atualizado"));
+router.get("/", (req, res) => res.status(200).send("Flashcards App 100% updated"));
 
 router.use("/users", userRoutes);
 router.use("/cards", cardRoutes);

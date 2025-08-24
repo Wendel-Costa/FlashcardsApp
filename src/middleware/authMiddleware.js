@@ -1,7 +1,7 @@
 // src/middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import user from '../models/User.js';
+import User from '../models/User.js';
 
 dotenv.config();
 
@@ -11,23 +11,23 @@ const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Não autorizado: Token não fornecido.' });
+        return res.status(401).json({ message: 'Unauthorized: Token not provided.' });
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
         const decoded = jwt.verify(token, secretKey);
-        const usuario = await user.findById(decoded.userId);
+        const user = await User.findById(decoded.userId);
 
-        if (!usuario) {
-            return res.status(401).json({ message: 'Não autorizado: Usuário não encontrado.' });
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized: User not found.' });
         }
 
-        req.userId = decoded.userId; // Adiciona o ID do usuário ao objeto de requisição
+        req.userId = decoded.userId; // Adiciona o ID do usuário ao objeto?
         next(); // Permite que a requisição continue para a próxima função (rota)
     } catch (error) {
-        return res.status(401).json({ message: 'Não autorizado: Token inválido.' });
+        return res.status(401).json({ message: 'Unauthorized: Invalid token.' });
     }
 };
 

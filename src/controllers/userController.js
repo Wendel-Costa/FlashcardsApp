@@ -1,4 +1,4 @@
-import user from "../models/User.js";
+import User from "../models/User.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -9,94 +9,94 @@ const secretKey = process.env.JWT_SECRET_KEY || 'seuSegredoSuperSecreto';
 
 class UserController {
 
-    static async listarUsers(req, res) {
+    static async getUsers(req, res) {
         try {
-            const listaUsers = await user.find({});
-            res.status(200).json(listaUsers);
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao listar usuários` });
+            const userList = await User.find({});
+            res.status(200).json(userList);
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to list users` });
         }
     }
 
-    static async listarUserPorId(req, res) {
+    static async getUserById(req, res) {
         try {
             const id = req.params.id;
-            const userEncontrado = await user.findById(id).populate('cards');
-            res.status(200).json(userEncontrado);
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na requisição do usuário` });
+            const foundUser = await User.findById(id).populate('cards');
+            res.status(200).json(foundUser);
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to request user` });
         }
     }
 
-    static async cadastrarUser(req, res) {
+    static async createUser(req, res) {
         try {
-            const novoUser = await user.create(req.body);
-            res.status(201).json({ message: "Usuário criado com sucesso", usuario: novoUser });
-        } catch (erro) {
-            if (erro.code === 11000 && erro.keyPattern && erro.keyPattern.nome) {
-                res.status(400).json({ message: "Nome de usuário já existe." });
+            const newUser = await User.create(req.body);
+            res.status(201).json({ message: "User created successfully", user: newUser });
+        } catch (error) {
+            if (error.code === 11000 && error.keyPattern && error.keyPattern.username) {
+                res.status(400).json({ message: "Username already exists." });
             } else {
-                res.status(500).json({ message: `${erro.message} - falha ao cadastrar usuário` });
+                res.status(500).json({ message: `${error.message} - failed to create user` });
             }
         }
     }
 
     static async registerUser(req, res) {
         try {
-            const { nome, senha } = req.body;
-            const existingUser = await user.findOne({ nome });
+            const { username, password } = req.body;
+            const existingUser = await User.findOne({ username });
 
             if (existingUser) {
-                return res.status(409).json({ message: "Nome de usuário já existe." });
+                return res.status(409).json({ message: "Username already exists." });
             }
 
-            const newUser = new user({ nome, senha });
+            const newUser = new User({ username, password });
             await newUser.save();
-            res.status(201).json({ message: "Usuário registrado com sucesso!" });
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao registrar usuário` });
+            res.status(201).json({ message: "User registered successfully!" });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to register user` });
         }
     }
 
     static async loginUser(req, res) {
         try {
-            const { nome, senha } = req.body;
-            const userEncontrado = await user.findOne({ nome }).select('+senha');
+            const { username, password } = req.body;
+            const foundUser = await User.findOne({ username }).select('+password');
 
-            if (!userEncontrado) {
-                return res.status(401).json({ message: "Usuário não encontrado." });
+            if (!foundUser) {
+                return res.status(401).json({ message: "User not found." });
             }
 
-            const senhaCorreta = await bcrypt.compare(senha, userEncontrado.senha);
+            const isPasswordCorrect = await bcrypt.compare(password, foundUser.password);
 
-            if (senhaCorreta) {
-                const token = jwt.sign({ userId: userEncontrado._id }, secretKey, { expiresIn: '1h' });
-                res.status(200).json({ message: "Login realizado com sucesso!", token });
+            if (isPasswordCorrect) {
+                const token = jwt.sign({ userId: foundUser._id }, secretKey, { expiresIn: '1h' });
+                res.status(200).json({ message: "Login successful!", token });
             } else {
-                return res.status(401).json({ message: "Senha incorreta." });
+                return res.status(401).json({ message: "Incorrect password." });
             }
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao fazer login` });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to login` });
         }
     }
 
-    static async atualizarUser(req, res) {
+    static async updateUser(req, res) {
         try {
             const id = req.params.id;
-            await user.findByIdAndUpdate(id, req.body);
-            res.status(200).json({ message: "Usuário atualizado com sucesso" });
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na atualização do usuário` });
+            await User.findByIdAndUpdate(id, req.body);
+            res.status(200).json({ message: "User updated successfully" });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to update user` });
         }
     }
 
-    static async excluirUser(req, res) {
+    static async deleteUser(req, res) {
         try {
             const id = req.params.id;
-            await user.findByIdAndDelete(id);
-            res.status(200).json({ message: "Usuário excluído com sucesso" });
-        } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha na exclusão do usuário` });
+            await User.findByIdAndDelete(id);
+            res.status(200).json({ message: "User deleted successfully" });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - failed to delete user` });
         }
     }
 }
