@@ -14,15 +14,15 @@
 <body>
 
     <div id="guest-banner" class="guest-banner" style="display: none;">
-        <p>Você está no Modo de Demonstração. Seus cards não serão salvos. <a href="#" id="guest-exit-link">Sair</a></p>
+        <p class="guest-banner__text">Você está no Modo de Demonstração. Seus cards não serão salvos. <a href="#" id="guest-exit-link" class="guest-banner__link">Sair</a></p>
     </div>
 
-    <section id="auth-view" class="view active-view">
+    <section id="auth-view" class="view view--active">
         <div class="auth-container">
             <div id="login-container">
-                <h2>CardTech</h2>
-                <p class="subtitle">Faça login para continuar</p>
-                <form id="login-form">
+                <h2 class="auth-container__title">CardTech</h2>
+                <p class="auth-container__subtitle">Faça login para continuar</p>
+                <form id="login-form" class="auth-container__form">
                     <div class="form-group">
                         <label for="login-username">Nome de Usuário</label>
                         <input type="text" id="login-username" required>
@@ -31,21 +31,21 @@
                         <label for="login-password">Senha</label>
                         <input type="password" id="login-password" required>
                     </div>
-                    <div class="form-group form-group-center">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    <div class="form-group form-group--center">
+                        <button type="submit" class="btn btn--primary">Entrar</button>
                     </div>
                     <div id="login-message" class="message"></div>
                 </form>
-                <div class="auth-switch">
+                <div class="auth-container__switch">
                     <p>Não tem uma conta? <a href="#" id="show-register-link">Registre-se</a></p>
-                    <a href="#" id="guest-mode-link" class="guest-link">Teste como Visitante</a>
+                    <a href="#" id="guest-mode-link" class="auth-container__guest-link">Teste como Visitante</a>
                 </div>
             </div>
 
             <div id="register-container" style="display: none;">
-                <h2>Criar Conta</h2>
-                <p class="subtitle">Comece a sua jornada de aprendizado</p>
-                <form id="register-form">
+                <h2 class="auth-container__title">Criar Conta</h2>
+                <p class="auth-container__subtitle">Comece a sua jornada de aprendizado</p>
+                <form id="register-form" class="auth-container__form">
                     <div class="form-group">
                         <label for="register-username">Nome de Usuário</label>
                         <input type="text" id="register-username" required>
@@ -54,12 +54,12 @@
                         <label for="register-password">Senha</label>
                         <input type="password" id="register-password" required>
                     </div>
-                    <div class="form-group form-group-center">
-                        <button type="submit" class="btn btn-primary">Registrar</button>
+                    <div class="form-group form-group--center">
+                        <button type="submit" class="btn btn--primary">Registrar</button>
                     </div>
                     <div id="register-message" class="message"></div>
                 </form>
-                <div class="auth-switch">
+                <div class="auth-container__switch">
                     <p>Já tem uma conta? <a href="#" id="show-login-link">Faça login</a></p>
                 </div>
             </div>
@@ -68,34 +68,35 @@
 
     <section id="app-view" class="view">
         <header class="app-header">
-            <h1>CardTech</h1>
-            <div class="user-menu">
+            <h1 class="app-header__title">CardTech</h1>
+            <div class="app-header__user-menu">
                 <span id="username-display"></span>
-                <button id="logout-button" class="btn btn-secondary">Sair</button>
+                <button id="logout-button" class="btn btn--secondary">Sair</button>
             </div>
         </header>
 
         <main id="main-content">
-            <div id="deck-list-view" class="main-view active-view">
+            <div id="deck-list-view" class="main-view main-view--active">
                 <div class="view-header">
-                    <h2>Meus Baralhos</h2>
-                    <div class="header-actions">
-                        <button id="add-card-btn" class="btn btn-primary">Adicionar Card</button>
-                        <button id="start-study-btn" class="btn btn-success">Estudar Agora</button>
+                    <h2 class="view-header__title">Meus Baralhos</h2>
+                    <div class="view-header__actions">
+                        <button id="add-card-btn" class="btn btn--primary">Adicionar Card</button>
+                        <button id="start-study-btn" class="btn btn--success">Estudar Agora</button>
                     </div>
                 </div>
+                <div id="deck-list-message" class="message"></div> 
                 <div id="deck-list-container" class="deck-list">
-                    </div>
+                </div>
             </div>
 
             <div id="add-card-view" class="main-view">
                  <div class="tab-nav">
-                    <button class="tab-btn active" data-tab="manual-tab">Criar Manualmente</button>
-                    <button class="tab-btn" data-tab="ia-single-tab">Gerar com IA</button>
-                    <button class="tab-btn" data-tab="ia-bulk-tab">Gerar Baralho com IA</button>
+                    <button class="tab-nav__button tab-nav__button--active" data-tab="manual-tab">Criar Manualmente</button>
+                    <button class="tab-nav__button" data-tab="ia-single-tab">Gerar com IA</button>
+                    <button class="tab-nav__button" data-tab="ia-bulk-tab">Gerar Baralho com IA</button>
                 </div>
 
-                <div id="manual-tab" class="tab-content active">
+                <div id="manual-tab" class="tab-content tab-content--active">
                     <h3>Criar Card Manualmente</h3>
                     <form id="manual-card-form">
                         <div class="form-group">
@@ -111,8 +112,8 @@
                             <input type="text" id="manual-tag" required>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Salvar Card</button>
+                            <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn--primary">Salvar Card</button>
                         </div>
                     </form>
                 </div>
@@ -129,8 +130,8 @@
                             <input type="text" id="ia-single-tag" required>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Gerar Card</button>
+                            <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn--primary">Gerar Card</button>
                         </div>
                     </form>
                 </div>
@@ -151,8 +152,8 @@
                             <input type="number" id="ia-bulk-quantidade" min="3" max="20" value="5" required>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary cancel-add-btn">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Gerar Baralho</button>
+                            <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
+                            <button type="submit" class="btn btn--primary">Gerar Baralho</button>
                         </div>
                     </form>
                 </div>
@@ -161,19 +162,19 @@
 
             <div id="study-view" class="main-view">
                 <div class="study-card">
-                    <div id="study-card-front" class="card-face">
-                        <div id="card-question-content" class="content"></div>
+                    <div id="study-card-front" class="study-card__face">
+                        <div id="card-question-content" class="study-card__content"></div>
                     </div>
-                    <div id="study-card-back" class="card-face" style="display: none;">
-                        <div id="card-answer-content" class="content"></div>
+                    <div id="study-card-back" class="study-card__face" style="display: none;">
+                        <div id="card-answer-content" class="study-card__content"></div>
                     </div>
                 </div>
                 <div class="study-actions">
-                    <button id="show-answer-btn" class="btn btn-primary">Mostrar Resposta</button>
+                    <button id="show-answer-btn" class="btn btn--primary">Mostrar Resposta</button>
                     <div id="grade-buttons" style="display: none;">
-                        <button class="btn btn-danger" data-quality="0">Errei</button>
-                        <button class="btn btn-warning" data-quality="3">Bom</button>
-                        <button class="btn btn-success" data-quality="5">Fácil</button>
+                        <button class="btn btn--danger" data-quality="0">Errei</button>
+                        <button class="btn btn--warning" data-quality="3">Bom</button>
+                        <button class="btn btn--success" data-quality="5">Fácil</button>
                     </div>
                 </div>
                  <div id="study-message" class="message"></div>
@@ -196,8 +197,8 @@
                     <textarea id="edit-resposta" rows="4" required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    <button type="button" id="cancel-edit-btn" class="btn btn--secondary">Cancelar</button>
+                    <button type="submit" class="btn btn--primary">Salvar Alterações</button>
                 </div>
             </form>
         </div>
