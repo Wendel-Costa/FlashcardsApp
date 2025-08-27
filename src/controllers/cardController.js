@@ -21,7 +21,7 @@ class CardController {
         const userId = req.userId;
 
         if (!topic || !tag || !count) {
-            return res.status(400).json({ message: "Topic, tag and count are required." });
+            return res.status(400).json({ message: "Tópico, baralho e quantidade são obrigatórios" });
         }
 
         try {
@@ -34,12 +34,13 @@ class CardController {
                 newCardsData = JSON.parse(cleanText);
             } catch (error) {
                 console.error("Erro ao fazer parse do JSON da IA:", aiResponseText);
-                return res.status(500).json({ message: "The AI returned a response in an invalid format. Please try again." });
+                return res.status(500).json({ message: "A IA retornou uma resposta em um formato inválido. Tente novamente." });
             }
             
             // Salvar os cards:
             const cardsToSave = newCardsData.map(c => ({
-                ...c,
+                question: c.question,
+                answer: c.answer,
                 tag: tag,
                 owner: userId,
             }));
@@ -49,10 +50,10 @@ class CardController {
             const savedCardIds = savedCards.map(c => c._id);
             await User.findByIdAndUpdate(userId, { $push: { cards: { $each: savedCardIds } } });
 
-            res.status(201).json({ message: `${count} cards about '${topic}' created successfully!`, cards: savedCards });
+            res.status(201).json({ message: `${count} cards sobre '${topic}' criados com sucesso!`, cards: savedCards });
 
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to generate deck with AI` });
+            res.status(500).json({ message: `${error.message} - Falha ao gerar baralho` });
         }
     }
 
@@ -66,7 +67,7 @@ class CardController {
             const cardToReview = await Card.findById(cardId);
 
             if (!cardToReview || cardToReview.owner.toString() !== req.userId) {
-                return res.status(403).json({ message: "Not authorized to review this card." });
+                return res.status(403).json({ message: "Não autorizado a revisar este card." });
             }
 
             if (quality < 3) {
@@ -98,23 +99,23 @@ class CardController {
             }
 
             await cardToReview.save();
-            res.status(200).json({ message: "Card reviewed successfully", card: cardToReview });
+            res.status(200).json({ message: "Card revisado com sucesso", card: cardToReview });
 
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to review card` });
+            res.status(500).json({ message: `${error.message} - Falha ao revisar o card` });
         }
     }
-
+    
     static async getCards(req, res) {
         try {
             const userId = req.userId; 
             const cardList = await Card.find({ owner: userId }).sort({ _id: -1 });
             res.status(200).json(cardList);
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to list cards` });
+            res.status(500).json({ message: `${error.message} - Falha ao listar os cards` });
         }
     }
-
+    
     static async getReviewQueue(req, res) {
         try {
             const userId = req.userId;
@@ -124,28 +125,7 @@ class CardController {
             });
             res.status(200).json(reviewList);
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to get review queue` });
-        }
-    }   
-
-    static async getCardsByUser(req, res) {
-        try {
-            const userId = req.params.id;
-            const user = await User.findById(userId);
-
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-
-            if (req.userId !== userId) {
-                return res.status(403).json({ message: "Not authorized to list cards for this user." });
-            }
-
-            const userCards = await Card.find({ owner: userId });
-            res.status(200).json(userCards);
-
-        } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to list user's cards` });
+            res.status(500).json({ message: `${error.message} - Falha ao buscar a fila de revisão` });
         }
     }
 
@@ -155,54 +135,52 @@ class CardController {
             const foundCard = await Card.findById(id);
 
             if (foundCard && foundCard.owner.toString() !== req.userId) {
-                return res.status(403).json({ message: "Not authorized to access this card." });
+                return res.status(403).json({ message: "Não autorizado a acessar este card" });
             }
 
             res.status(200).json(foundCard);
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to request card` });
+            res.status(500).json({ message: `${error.message} - Falha na requisição do card` });
         }
     }
 
     static async createCard(req, res) {
         try {
             const userId = req.userId;
-            req.body.owner = userId;
-
-            const newCard = await Card.create(req.body);
+            const { question, answer, tag } = req.body;
+            const newCard = await Card.create({ question, answer, tag, owner: userId });
 
             await User.findByIdAndUpdate(userId, { $push: { cards: newCard._id } });
 
-            res.status(201).json({ message: "Card created successfully", card: newCard });
+            res.status(201).json({ message: "Card criado com sucesso", card: newCard });
 
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to create card` });
+            res.status(500).json({ message: `${error.message} - Falha ao criar o card` });
         }
     }
 
     static async generateCardByAI(req, res) {
-        const { detailLevel, tone } = req.body;
+        const { detailLevel, tone, question, tag } = req.body;
         try {
             const userId = req.userId;
-            req.body.owner = userId;
-
-            const aiResponse = await generateText(req.body.question, detailLevel, tone);
+            
+            const aiResponse = await generateText(question, detailLevel, tone);
 
             const newCardWithAI = {
-                question: req.body.question,
+                question: question,
                 answer: aiResponse,
-                tag: req.body.tag,
-                owner: req.body.owner
+                tag: tag,
+                owner: userId
             };
 
             const newCard = await Card.create(newCardWithAI);
 
             await User.findByIdAndUpdate(userId, { $push: { cards: newCard._id } });
 
-            res.status(201).json({ message: 'Card generated by AI successfully', card: newCard });
+            res.status(201).json({ message: 'Card gerado com sucesso!', card: newCard });
 
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to create card` });
+            res.status(500).json({ message: `${error.message} - Falha ao criar o card` });
         }
     }
 
@@ -212,13 +190,13 @@ class CardController {
             const cardToUpdate = await Card.findById(id);
 
             if (!cardToUpdate || cardToUpdate.owner.toString() !== req.userId) {
-                return res.status(403).json({ message: "Not authorized to update this card." });
+                return res.status(403).json({ message: "Não autorizado a atualizar este card" });
             }
 
             await Card.findByIdAndUpdate(id, req.body);
-            res.status(200).json({ message: "Card updated successfully" });
+            res.status(200).json({ message: "Card atualizado com sucesso" });
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to update card` });
+            res.status(500).json({ message: `${error.message} - Falha ao atualizar card` });
         }
     }
 
@@ -228,7 +206,7 @@ class CardController {
             const deletedCard = await Card.findById(id);
 
             if (!deletedCard || deletedCard.owner.toString() !== req.userId) {
-                return res.status(403).json({ message: "Not authorized to delete this card." });
+                return res.status(403).json({ message: "Não autorizado a excluir este card" });
             }
 
             await Card.findByIdAndDelete(id);
@@ -239,9 +217,9 @@ class CardController {
                 await user.save();
             }
 
-            res.status(200).json({ message: "Card deleted successfully" });
+            res.status(200).json({ message: "Card excluído com sucesso" });
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to delete card` });
+            res.status(500).json({ message: `${error.message} - falha ao excluir card` });
         }
     }
 }

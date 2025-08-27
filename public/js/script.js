@@ -18,6 +18,7 @@ const appView = document.getElementById('app-view');
 const deckListView = document.getElementById('deck-list-view');
 const addCardView = document.getElementById('add-card-view');
 const studyView = document.getElementById('study-view');
+const cardListView = document.getElementById('card-list-view');
 
 // Auth
 const loginForm = document.getElementById('login-form');
@@ -42,6 +43,13 @@ const addCardBtn = document.getElementById('add-card-btn');
 const startStudyBtn = document.getElementById('start-study-btn');
 const deckListMessage = document.getElementById('deck-list-message');
 
+// Card List View
+const cardListContainer = document.getElementById('card-list-container');
+const cardListTitle = document.getElementById('card-list-title');
+const backToDecksBtn = document.getElementById('back-to-decks-btn');
+const studyThisDeckBtn = document.getElementById('study-this-deck-btn');
+
+
 // Add Card View
 const tabButtons = document.querySelectorAll('.tab-nav__button');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -50,6 +58,7 @@ const iaSingleForm = document.getElementById('ia-single-form');
 const iaBulkForm = document.getElementById('ia-bulk-form');
 const cancelAddButtons = document.querySelectorAll('.cancel-add-btn');
 const generationMessage = document.getElementById('generation-message');
+const existingTagsDatalist = document.getElementById('existing-tags');
 
 // Study View
 const studyCardFront = document.getElementById('study-card-front');
@@ -59,6 +68,7 @@ const cardAnswerContent = document.getElementById('card-answer-content');
 const showAnswerBtn = document.getElementById('show-answer-btn');
 const gradeButtons = document.getElementById('grade-buttons');
 const studyMessage = document.getElementById('study-message');
+const stopStudyBtn = document.getElementById('stop-study-btn');
 
 // Edit Modal
 const editModal = document.getElementById('edit-modal');
@@ -71,11 +81,6 @@ const cancelEditBtn = document.getElementById('cancel-edit-btn');
 // API FETHC 
 
 async function apiFetch(endpoint, options = {}) {
-    if (state.isGuest && !endpoint.includes('/users/')) {
-        // A lógica de alerta agora está no event listener específico
-        return; 
-    }
-
     const { body, ...restOptions } = options;
     
     const headers = {
@@ -113,7 +118,7 @@ function showView(viewToShow) {
 }
 
 function showMainView(viewToShow) {
-    [deckListView, addCardView, studyView].forEach(view => view.classList.remove('main-view--active'));
+    [deckListView, addCardView, studyView, cardListView].forEach(view => view.classList.remove('main-view--active'));
     viewToShow.classList.add('main-view--active');
 }
 
@@ -191,13 +196,25 @@ function handleGuestMode(e) {
     
     initializeApp();
 
-    renderDecks([
+    state.allCards = [
         { _id: 'g1', question: 'O que é HTML?', answer: 'É uma linguagem de marcação para criar páginas web.', tag: 'Tecnologia', status: 'new', nextReviewDate: new Date() },
         { _id: 'g2', question: 'Qual a capital do Brasil?', answer: 'Brasília.', tag: 'Geografia', status: 'new', nextReviewDate: new Date() }
-    ]);
+    ];
+    renderDecks(state.allCards);
+    populateTagDatalist();
 }
 
-// Carregar cards
+// Carregar e Renderizar Baralhos e Cards
+
+function populateTagDatalist() {
+    const tags = new Set(state.allCards.map(card => card.tag).filter(Boolean));
+    existingTagsDatalist.innerHTML = '';
+    tags.forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag;
+        existingTagsDatalist.appendChild(option);
+    });
+}
 
 async function fetchAndRenderDecks() {
     if(state.isGuest) return;
@@ -205,9 +222,10 @@ async function fetchAndRenderDecks() {
     try {
         state.allCards = await apiFetch('/cards');
         renderDecks(state.allCards);
+        populateTagDatalist();
     } catch (error) {
         console.error("Failed to fetch decks:", error);
-        deckListContainer.innerHTML = `<p>Error loading decks.</p>`;
+        deckListContainer.innerHTML = `<p>Erro ao carregar baralhos.</p>`;
     }
 }
 
@@ -233,7 +251,7 @@ function renderDecks(cards) {
     }, {});
 
     deckListContainer.innerHTML = Object.entries(decks).map(([tagName, counts]) => `
-        <div class="deck-list__item">
+        <div class="deck-list__item" data-tag="${tagName}">
             <h3 class="deck-list__item-title">${tagName}</h3>
             <div class="deck-list__item-stats">
                 <span>Total: ${counts.total}</span>
@@ -244,8 +262,29 @@ function renderDecks(cards) {
     `).join('');
 }
 
+function renderCardList(tagName) {
+    cardListTitle.textContent = tagName;
+    const cardsInDeck = state.allCards.filter(card => (card.tag || 'Sem Categoria') === tagName);
 
-// --- CARD CREATION ---
+    if (cardsInDeck.length === 0) {
+        cardListContainer.innerHTML = "<p>Nenhum card neste baralho.</p>";
+        return;
+    }
+
+    cardListContainer.innerHTML = cardsInDeck.map(card => `
+        <div class="card-list-item">
+            <div class="card-list-item__content">${marked.parse(card.question)}</div>
+            <div class="card-list-item__content">${marked.parse(card.answer)}</div>
+            <div class="card-list-item__actions">
+                <button class="btn btn--secondary edit-card-btn" data-card-id="${card._id}">Editar</button>
+                <button class="btn btn--danger delete-card-btn" data-card-id="${card._id}">Apagar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+// --- CRIAÇÃO DE CARDS ---
 
 function showTemporaryMessage(message, isError = false) {
     generationMessage.textContent = message;
@@ -258,15 +297,19 @@ function showTemporaryMessage(message, isError = false) {
 
 async function handleManualCardSubmit(event) {
     event.preventDefault();
-    if (state.isGuest) {
-        showTemporaryMessage("Crie uma conta para salvar seus cards.", true);
-        return;
-    }
-
-    const question = manualCardForm.querySelector('#manual-pergunta').value;
-    const answer = manualCardForm.querySelector('#manual-resposta').value;
+    const question = manualCardForm.querySelector('#manual-question').value;
+    const answer = manualCardForm.querySelector('#manual-answer').value;
     const tag = manualCardForm.querySelector('#manual-tag').value;
     const button = manualCardForm.querySelector('button[type="submit"]');
+
+    if (state.isGuest) {
+        const newCard = { _id: `g${Date.now()}`, question, answer, tag, status: 'new', nextReviewDate: new Date() };
+        state.allCards.push(newCard);
+        renderDecks(state.allCards);
+        populateTagDatalist();
+        showMainView(deckListView);
+        return;
+    }
 
     try {
         button.textContent = 'Salvando...';
@@ -275,10 +318,9 @@ async function handleManualCardSubmit(event) {
             method: 'POST',
             body: { question, answer, tag }
         });
-        showTemporaryMessage("Card criado com sucesso!");
         manualCardForm.reset();
-        await fetchAndRenderDecks(); // Atualiza a lista de baralhos
-        showMainView(deckListView); // Volta para a tela principal
+        await fetchAndRenderDecks();
+        showMainView(deckListView);
     } catch (error) {
         showTemporaryMessage(error.message, true);
     } finally {
@@ -287,65 +329,73 @@ async function handleManualCardSubmit(event) {
     }
 }
 
-async function handleIaSingleSubmit(event) {
-    event.preventDefault();
+async function startStudySession(deckTag = null) {
+    let cardsToReview;
+
     if (state.isGuest) {
-        showTemporaryMessage("Crie uma conta para usar a IA.", true);
+        cardsToReview = deckTag ? state.allCards.filter(c => c.tag === deckTag) : state.allCards;
+    } else {
+        if (deckTag) {
+            cardsToReview = state.allCards.filter(c => c.tag === deckTag && new Date(c.nextReviewDate) <= new Date());
+        } else {
+            cardsToReview = await apiFetch('/cards/review-queue');
+        }
+    }
+
+    state.studyQueue = cardsToReview;
+    state.currentStudyCardIndex = 0;
+    
+    if (state.studyQueue.length === 0) {
+        studyMessage.textContent = deckTag ? "Nenhum card para revisar neste baralho hoje." : "Você revisou tudo por hoje!";
+        setTimeout(() => studyMessage.textContent = '', 5000);
         return;
     }
 
-    const question = iaSingleForm.querySelector('#ia-pergunta').value;
-    const tag = iaSingleForm.querySelector('#ia-single-tag').value;
-    const button = iaSingleForm.querySelector('button[type="submit"]');
-
-    try {
-        button.textContent = 'Gerando...';
-        button.disabled = true;
-        await apiFetch('/cards/generate-text', {
-            method: 'POST',
-            body: { question, tag, detailLevel: 'medium', tone: 'neutral' }
-        });
-        showTemporaryMessage("Card gerado com IA com sucesso!");
-        iaSingleForm.reset();
-        await fetchAndRenderDecks();
-        showMainView(deckListView);
-    } catch (error) {
-        showTemporaryMessage(error.message, true);
-    } finally {
-        button.textContent = 'Gerar Card';
-        button.disabled = false;
-    }
+    showMainView(studyView);
+    renderCurrentStudyCard();
 }
 
-async function handleIaBulkSubmit(event) {
-    event.preventDefault();
-    if (state.isGuest) {
-        showTemporaryMessage("Crie uma conta para usar a IA.", true);
+function renderCurrentStudyCard() {
+    if (state.currentStudyCardIndex >= state.studyQueue.length) {
+        studyMessage.textContent = "Sessão de estudos concluída!";
+        setTimeout(() => {
+            studyMessage.textContent = '';
+            showMainView(deckListView);
+        }, 3000);
         return;
     }
 
-    const topic = iaBulkForm.querySelector('#ia-bulk-topico').value;
-    const tag = iaBulkForm.querySelector('#ia-bulk-tag').value;
-    const count = iaBulkForm.querySelector('#ia-bulk-quantidade').value;
-    const button = iaBulkForm.querySelector('button[type="submit"]');
+    const card = state.studyQueue[state.currentStudyCardIndex];
+    cardQuestionContent.innerHTML = marked.parse(card.question);
+    cardAnswerContent.innerHTML = marked.parse(card.answer);
 
-    try {
-        button.textContent = 'Gerando Baralho...';
-        button.disabled = true;
-        await apiFetch('/cards/generate-deck', {
-            method: 'POST',
-            body: { topic, tag, count }
-        });
-        showTemporaryMessage("Baralho gerado com IA com sucesso!");
-        iaBulkForm.reset();
-        await fetchAndRenderDecks();
-        showMainView(deckListView);
-    } catch (error) {
-        showTemporaryMessage(error.message, true);
-    } finally {
-        button.textContent = 'Gerar Baralho';
-        button.disabled = false;
+    studyCardBack.style.display = 'none';
+    gradeButtons.style.display = 'none';
+    showAnswerBtn.style.display = 'block';
+}
+
+function handleShowAnswer() {
+    studyCardBack.style.display = 'block';
+    gradeButtons.style.display = 'flex';
+    showAnswerBtn.style.display = 'none';
+}
+
+async function handleGradeCard(quality) {
+    const card = state.studyQueue[state.currentStudyCardIndex];
+
+    if (!state.isGuest) {
+        try {
+            await apiFetch(`/cards/${card._id}/review`, {
+                method: 'POST',
+                body: { quality }
+            });
+        } catch (error) {
+            console.error("Falha ao salvar a revisão:", error);
+        }
     }
+    
+    state.currentStudyCardIndex++;
+    renderCurrentStudyCard();
 }
 
 
@@ -393,27 +443,32 @@ document.addEventListener('DOMContentLoaded', () => {
         loginContainer.style.display = 'block';
     });
 
-    // Main
-    addCardBtn.addEventListener('click', () => {
-        deckListMessage.textContent = '';
-        if (state.isGuest) {
-            deckListMessage.textContent = "Crie uma conta para adicionar seus próprios cards!";
-            deckListMessage.className = 'message message--error';
-            
-            setTimeout(() => {
-                deckListMessage.textContent = '';
-                deckListMessage.className = 'message';
-            }, 5000);
-            return;
-        }
-        showMainView(addCardView)
-    });
-    
-    cancelAddButtons.forEach(btn => {
-        btn.addEventListener('click', () => showMainView(deckListView));
+    // Navegação Principal
+    addCardBtn.addEventListener('click', () => showMainView(addCardView));
+    cancelAddButtons.forEach(btn => btn.addEventListener('click', () => showMainView(deckListView)));
+    backToDecksBtn.addEventListener('click', () => showMainView(deckListView));
+    startStudyBtn.addEventListener('click', () => startStudySession());
+    stopStudyBtn.addEventListener('click', async () => {
+        await fetchAndRenderDecks();
+        showMainView(deckListView);
     });
 
-    // Add Card
+    // Navegação por Baralhos
+    deckListContainer.addEventListener('click', (event) => {
+        const deckItem = event.target.closest('.deck-list__item');
+        if (deckItem) {
+            const tagName = deckItem.dataset.tag;
+            renderCardList(tagName);
+            showMainView(cardListView);
+        }
+    });
+
+    studyThisDeckBtn.addEventListener('click', () => {
+        const tagName = cardListTitle.textContent;
+        startStudySession(tagName);
+    });
+
+    // Abas de Adicionar Card
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('tab-nav__button--active'));
@@ -424,11 +479,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Adiciona os listeners para os formulários de criação de card
+    // Submissão de Formulários de Criação
     manualCardForm.addEventListener('submit', handleManualCardSubmit);
     iaSingleForm.addEventListener('submit', handleIaSingleSubmit);
     iaBulkForm.addEventListener('submit', handleIaBulkSubmit);
 
+    // Lógica da Tela de Estudo
+    showAnswerBtn.addEventListener('click', handleShowAnswer);
+    gradeButtons.addEventListener('click', (event) => {
+        if (event.target.dataset.quality) {
+            handleGradeCard(parseInt(event.target.dataset.quality));
+        }
+    });
+
     // Check inicial
     checkInitialAuthState();
 });
+
+async function handleIaSingleSubmit(event) {
+    event.preventDefault();
+    const question = iaSingleForm.querySelector('#ia-question').value;
+    const tag = iaSingleForm.querySelector('#ia-single-tag').value;
+
+    if (state.isGuest) {
+        const newCard = { _id: `g${Date.now()}`, question, answer: "Resposta gerada por IA (simulação)", tag, status: 'new', nextReviewDate: new Date() };
+        state.allCards.push(newCard);
+        renderDecks(state.allCards);
+        populateTagDatalist();
+        showMainView(deckListView);
+        return;
+    }
+    
+    const button = iaSingleForm.querySelector('button[type="submit"]');
+    try {
+        button.textContent = 'Gerando...';
+        button.disabled = true;
+        await apiFetch('/cards/generate-text', {
+            method: 'POST',
+            body: { question, tag, detailLevel: 'medium', tone: 'neutral' }
+        });
+        iaSingleForm.reset();
+        await fetchAndRenderDecks();
+        showMainView(deckListView);
+    } catch (error) {
+        showTemporaryMessage(error.message, true);
+    } finally {
+        button.textContent = 'Gerar Card';
+        button.disabled = false;
+    }
+}
+
+async function handleIaBulkSubmit(event) {
+    event.preventDefault();
+    const topic = iaBulkForm.querySelector('#ia-bulk-topic').value;
+    const tag = iaBulkForm.querySelector('#ia-bulk-tag').value;
+    const count = iaBulkForm.querySelector('#ia-bulk-count').value;
+
+    if (state.isGuest) {
+        for (let i = 0; i < count; i++) {
+            const newCard = { _id: `g${Date.now() + i}`, question: `${topic} (Card ${i+1})`, answer: "Resposta gerada por IA (simulação)", tag, status: 'new', nextReviewDate: new Date() };
+            state.allCards.push(newCard);
+        }
+        renderDecks(state.allCards);
+        populateTagDatalist();
+        showMainView(deckListView);
+        return;
+    }
+
+    const button = iaBulkForm.querySelector('button[type="submit"]');
+    try {
+        button.textContent = 'Gerando Baralho...';
+        button.disabled = true;
+        await apiFetch('/cards/generate-deck', {
+            method: 'POST',
+            body: { topic, tag, count }
+        });
+        iaBulkForm.reset();
+        await fetchAndRenderDecks();
+        showMainView(deckListView);
+    } catch (error) {
+        showTemporaryMessage(error.message, true);
+    } finally {
+        button.textContent = 'Gerar Baralho';
+        button.disabled = false;
+    }
+}

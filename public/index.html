@@ -89,6 +89,18 @@
                 </div>
             </div>
 
+            <div id="card-list-view" class="main-view">
+                <div class="view-header">
+                    <button id="back-to-decks-btn" class="btn btn--secondary"> &lt; Voltar aos Baralhos</button>
+                    <h2 id="card-list-title" class="view-header__title"></h2>
+                    <div class="view-header__actions">
+                         <button id="study-this-deck-btn" class="btn btn--success">Estudar este Baralho</button>
+                    </div>
+                </div>
+                <div id="card-list-container">
+                    </div>
+            </div>
+
             <div id="add-card-view" class="main-view">
                  <div class="tab-nav">
                     <button class="tab-nav__button tab-nav__button--active" data-tab="manual-tab">Criar Manualmente</button>
@@ -96,20 +108,22 @@
                     <button class="tab-nav__button" data-tab="ia-bulk-tab">Gerar Baralho com IA</button>
                 </div>
 
+                <datalist id="existing-tags"></datalist>
+
                 <div id="manual-tab" class="tab-content tab-content--active">
                     <h3>Criar Card Manualmente</h3>
                     <form id="manual-card-form">
                         <div class="form-group">
-                            <label for="manual-pergunta">Pergunta (suporta Markdown)</label>
-                            <textarea id="manual-pergunta" rows="3" required></textarea>
+                            <label for="manual-question">Pergunta (suporta Markdown)</label>
+                            <textarea id="manual-question" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="manual-resposta">Resposta (suporta Markdown)</label>
-                            <textarea id="manual-resposta" rows="3" required></textarea>
+                            <label for="manual-answer">Resposta (suporta Markdown)</label>
+                            <textarea id="manual-answer" rows="3" required></textarea>
                         </div>
                          <div class="form-group">
-                            <label for="manual-tag">Tag (Baralho)</label>
-                            <input type="text" id="manual-tag" required>
+                            <label for="manual-tag">Baralho (digite um novo ou selecione)</label>
+                            <input type="text" id="manual-tag" list="existing-tags" required>
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
@@ -122,12 +136,12 @@
                     <h3>Gerar um Card com IA</h3>
                     <form id="ia-single-form">
                          <div class="form-group">
-                            <label for="ia-pergunta">Tópico ou Pergunta</label>
-                            <input type="text" id="ia-pergunta" required>
+                            <label for="ia-question">Tópico ou Pergunta</label>
+                            <input type="text" id="ia-question" required>
                         </div>
                          <div class="form-group">
-                            <label for="ia-single-tag">Tag (Baralho)</label>
-                            <input type="text" id="ia-single-tag" required>
+                            <label for="ia-single-tag">Baralho (digite um novo ou selecione)</label>
+                            <input type="text" id="ia-single-tag" list="existing-tags" required>
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
@@ -140,16 +154,16 @@
                     <h3>Gerar Baralho com IA</h3>
                      <form id="ia-bulk-form">
                          <div class="form-group">
-                            <label for="ia-bulk-topico">Tópico Principal</label>
-                            <input type="text" id="ia-bulk-topico" required placeholder="Ex: Segunda Guerra Mundial">
+                            <label for="ia-bulk-topic">Tópico Principal</label>
+                            <input type="text" id="ia-bulk-topic" required placeholder="Ex: Segunda Guerra Mundial">
                         </div>
                          <div class="form-group">
-                            <label for="ia-bulk-tag">Nome do Baralho (Tag)</label>
-                            <input type="text" id="ia-bulk-tag" required placeholder="Ex: História">
+                            <label for="ia-bulk-tag">Nome do Baralho</label>
+                            <input type="text" id="ia-bulk-tag" list="existing-tags" required placeholder="Ex: História">
                         </div>
                          <div class="form-group">
-                            <label for="ia-bulk-quantidade">Número de Cards</label>
-                            <input type="number" id="ia-bulk-quantidade" min="3" max="20" value="5" required>
+                            <label for="ia-bulk-count">Número de Cards</label>
+                            <input type="number" id="ia-bulk-count" min="3" max="20" value="5" required>
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
@@ -161,6 +175,9 @@
             </div>
 
             <div id="study-view" class="main-view">
+                 <div class="view-header">
+                     <button id="stop-study-btn" class="btn btn--secondary">&lt; Parar Estudo</button>
+                 </div>
                 <div class="study-card">
                     <div id="study-card-front" class="study-card__face">
                         <div id="card-question-content" class="study-card__content"></div>
@@ -189,12 +206,12 @@
             <form id="edit-card-form">
                 <input type="hidden" id="edit-card-id">
                 <div class="form-group">
-                    <label for="edit-pergunta">Pergunta</label>
-                    <textarea id="edit-pergunta" rows="4" required></textarea>
+                    <label for="edit-question">Pergunta</label>
+                    <textarea id="edit-question" rows="4" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="edit-resposta">Resposta</label>
-                    <textarea id="edit-resposta" rows="4" required></textarea>
+                    <label for="edit-answer">Resposta</label>
+                    <textarea id="edit-answer" rows="4" required></textarea>
                 </div>
                 <div class="form-actions">
                     <button type="button" id="cancel-edit-btn" class="btn btn--secondary">Cancelar</button>

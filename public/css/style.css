@@ -220,6 +220,60 @@ body {
     gap: 1rem;
 }
 
+/* TELA DE LISTA DE BARALHOS */
+.deck-list__item {
+    background-color: var(--bg-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.deck-list__item:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--primary-accent);
+}
+
+.deck-list__item-stats {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* TELA DE LISTA DE CARDS */
+.card-list-item {
+    background-color: var(--bg-surface);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.card-list-item__content {
+    border-right: 1px solid var(--border-color);
+    padding-right: 1rem;
+}
+.card-list-item__content:last-of-type {
+    border-right: none;
+    padding-right: 0;
+}
+
+.card-list-item__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.card-list-item__actions .btn {
+    padding: 0.4rem 0.8rem;
+}
+
 /* TELA DE ESTUDO */
 .study-card {
     background-color: var(--bg-surface);
@@ -286,7 +340,7 @@ body {
 }
 
 /* CONTEÚDO MARKDOWN */
-.study-card__content code {
+.study-card__content code, .card-list-item__content code {
     font-family: var(--font-code);
     background-color: var(--bg-dark);
     padding: 0.2rem 0.4rem;
@@ -294,13 +348,14 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.study-card__content pre {
+.study-card__content pre, .card-list-item__content pre {
     background-color: var(--bg-dark);
     padding: 1rem;
     border-radius: 4px;
     border: 1px solid var(--border-color);
     white-space: pre-wrap;
     word-wrap: break-word;
+    text-align: left;
 }
 
 /* MODAL */

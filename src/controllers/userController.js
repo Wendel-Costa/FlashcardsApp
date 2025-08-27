@@ -14,7 +14,7 @@ class UserController {
             const userList = await User.find({});
             res.status(200).json(userList);
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to list users` });
+            res.status(500).json({ message: `${error.message} - falha ao listar usuários` });
         }
     }
 
@@ -24,19 +24,19 @@ class UserController {
             const foundUser = await User.findById(id).populate('cards');
             res.status(200).json(foundUser);
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to request user` });
+            res.status(500).json({ message: `${error.message} - usuário não encontrado` });
         }
     }
 
     static async createUser(req, res) {
         try {
             const newUser = await User.create(req.body);
-            res.status(201).json({ message: "User created successfully", user: newUser });
+            res.status(201).json({ message: "Usuário criado com sucesso", user: newUser });
         } catch (error) {
             if (error.code === 11000 && error.keyPattern && error.keyPattern.username) {
-                res.status(400).json({ message: "Username already exists." });
+                res.status(400).json({ message: "Já existe um usuário com esse nome" });
             } else {
-                res.status(500).json({ message: `${error.message} - failed to create user` });
+                res.status(500).json({ message: `${error.message} - falha ao criar usuário` });
             }
         }
     }
@@ -47,14 +47,14 @@ class UserController {
             const existingUser = await User.findOne({ username });
 
             if (existingUser) {
-                return res.status(409).json({ message: "Username already exists." });
+                return res.status(409).json({ message: "Já existe um usuário com esse nome" });
             }
 
             const newUser = new User({ username, password });
             await newUser.save();
-            res.status(201).json({ message: "User registered successfully!" });
+            res.status(201).json({ message: "Usuário criado com sucesso" });
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to register user` });
+            res.status(500).json({ message: `${error.message} - falha ao criar usuário` });
         }
     }
 
@@ -64,19 +64,19 @@ class UserController {
             const foundUser = await User.findOne({ username }).select('+password');
 
             if (!foundUser) {
-                return res.status(401).json({ message: "User not found." });
+                return res.status(401).json({ message: "Usuário não encontrado" });
             }
 
             const isPasswordCorrect = await bcrypt.compare(password, foundUser.password);
 
             if (isPasswordCorrect) {
                 const token = jwt.sign({ userId: foundUser._id }, secretKey, { expiresIn: '1h' });
-                res.status(200).json({ message: "Login successful!", token });
+                res.status(200).json({ message: "Login realizado com sucesso", token });
             } else {
-                return res.status(401).json({ message: "Incorrect password." });
+                return res.status(401).json({ message: "Senha incorreta" });
             }
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to login` });
+            res.status(500).json({ message: `${error.message} - Falha no login` });
         }
     }
 
@@ -84,9 +84,9 @@ class UserController {
         try {
             const id = req.params.id;
             await User.findByIdAndUpdate(id, req.body);
-            res.status(200).json({ message: "User updated successfully" });
+            res.status(200).json({ message: "Usuário atualizado com sucesso" });
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to update user` });
+            res.status(500).json({ message: `${error.message} - Falha ao atualizar usuário` });
         }
     }
 
@@ -94,9 +94,9 @@ class UserController {
         try {
             const id = req.params.id;
             await User.findByIdAndDelete(id);
-            res.status(200).json({ message: "User deleted successfully" });
+            res.status(200).json({ message: "Usuário excluído" });
         } catch (error) {
-            res.status(500).json({ message: `${error.message} - failed to delete user` });
+            res.status(500).json({ message: `${error.message} - Falha ao excluir usuário` });
         }
     }
 }
