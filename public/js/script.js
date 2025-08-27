@@ -69,6 +69,7 @@ const showAnswerBtn = document.getElementById('show-answer-btn');
 const gradeButtons = document.getElementById('grade-buttons');
 const studyMessage = document.getElementById('study-message');
 const stopStudyBtn = document.getElementById('stop-study-btn');
+const studyCardSeparator = document.querySelector('.study-card__separator');
 
 // Edit Modal
 const editModal = document.getElementById('edit-modal');
@@ -238,11 +239,14 @@ function renderDecks(cards) {
     const decks = cards.reduce((acc, card) => {
         const tag = card.tag || 'Sem Categoria';
         if (!acc[tag]) {
-            acc[tag] = { total: 0, new: 0, review: 0 };
+            acc[tag] = { total: 0, new: 0, review: 0, learning: 0 };
         }
         acc[tag].total++;
-        if (new Date(card.nextReviewDate) <= new Date()) {
-            acc[tag].review++;
+
+        const now = new Date();
+        if (new Date(card.nextReviewDate) <= now) {
+            if(card.status === 'reviewing') acc[tag].review++;
+            if(card.status === 'learning') acc[tag].learning++;
         }
         if (card.status === 'new') {
             acc[tag].new++;
@@ -251,13 +255,17 @@ function renderDecks(cards) {
     }, {});
 
     deckListContainer.innerHTML = Object.entries(decks).map(([tagName, counts]) => `
-        <div class="deck-list__item" data-tag="${tagName}">
-            <h3 class="deck-list__item-title">${tagName}</h3>
-            <div class="deck-list__item-stats">
-                <span>Total: ${counts.total}</span>
-                <span>Novos: ${counts.new}</span>
-                <span>Revisar: ${counts.review}</span>
+        <div class="deck-list__item">
+            <div class="deck-list__main">
+                <h3 class="deck-list__study-link" data-tag="${tagName}">${tagName}</h3>
+                <div class="deck-list__item-stats">
+                    <span>Total: ${counts.total}</span>
+                    <span style="color: #00bcd4;">Novos: ${counts.new}</span>
+                    <span style="color: #f44336;">Aprendendo: ${counts.learning}</span>
+                    <span style="color: #4caf50;">Revisar: ${counts.review}</span>
+                </div>
             </div>
+            <button class="deck-list__config-btn" data-tag="${tagName}" title="Configurar Baralho">⚙️</button>
         </div>
     `).join('');
 }
@@ -286,25 +294,49 @@ function renderCardList(tagName) {
 
 // --- CRIAÇÃO DE CARDS ---
 
-function showTemporaryMessage(message, isError = false) {
-    generationMessage.textContent = message;
-    generationMessage.className = isError ? 'message message--error' : 'message';
+function showTemporaryMessage(message, isError = false, container = generationMessage) {
+    container.textContent = message;
+    container.className = isError ? 'message message--error' : 'message';
     setTimeout(() => {
-        generationMessage.textContent = '';
-        generationMessage.className = 'message';
+        container.textContent = '';
+        container.className = 'message';
     }, 5000);
 }
 
-async function handleManualCardSubmit(event) {
-    event.preventDefault();
-    const question = manualCardForm.querySelector('#manual-question').value;
-    const answer = manualCardForm.querySelector('#manual-answer').value;
-    const tag = manualCardForm.querySelector('#manual-tag').value;
-    const button = manualCardForm.querySelector('button[type="submit"]');
+async function handleCardSubmit(form, endpoint) {
+    const button = form.querySelector('button[type="submit"]');
+    const originalButtonText = button.textContent;
 
     if (state.isGuest) {
+        const question = form.querySelector('input[id*="question"], textarea[id*="question"], input[id*="topic"]').value;
+        const answer = form.querySelector('textarea[id*="answer"]')?.value || "Resposta gerada por IA (simulação)";
+        const tag = form.querySelector('input[id*="tag"]').value;
         const newCard = { _id: `g${Date.now()}`, question, answer, tag, status: 'new', nextReviewDate: new Date() };
-        state.allCards.push(newCard);
+        
+        if (endpoint === '/users/guest/generate-deck') {
+            const topic = form.querySelector('input[id*="topic"]').value;
+            const count = form.querySelector('input[id*="count"]').value;
+            button.textContent = 'Gerando...';
+            button.disabled = true;
+            try {
+                const response = await apiFetch(endpoint, { method: 'POST', body: { topic, count } });
+                response.forEach(card => state.allCards.push({ ...card, _id: `g${Date.now()}` }));
+            } catch(e) {}
+            button.textContent = originalButtonText;
+            button.disabled = false;
+        } else if (endpoint === '/users/guest/generate-text') {
+            button.textContent = 'Gerando...';
+            button.disabled = true;
+            try {
+                const response = await apiFetch(endpoint, { method: 'POST', body: { question, tag } });
+                state.allCards.push({ ...response.card, _id: `g${Date.now()}` });
+            } catch(e) {}
+            button.textContent = originalButtonText;
+            button.disabled = false;
+        } else {
+             state.allCards.push(newCard);
+        }
+
         renderDecks(state.allCards);
         populateTagDatalist();
         showMainView(deckListView);
@@ -312,22 +344,25 @@ async function handleManualCardSubmit(event) {
     }
 
     try {
-        button.textContent = 'Salvando...';
+        button.textContent = 'Enviando...';
         button.disabled = true;
-        await apiFetch('/cards', {
-            method: 'POST',
-            body: { question, answer, tag }
-        });
-        manualCardForm.reset();
+        const formData = new FormData(form);
+        const body = Object.fromEntries(formData.entries());
+        await apiFetch(endpoint, { method: 'POST', body });
+        
+        form.reset();
         await fetchAndRenderDecks();
         showMainView(deckListView);
     } catch (error) {
-        showTemporaryMessage(error.message, true);
+        showTemporaryMessage(error.message, true, generationMessage);
     } finally {
-        button.textContent = 'Salvar Card';
+        button.textContent = originalButtonText;
         button.disabled = false;
     }
 }
+
+
+// --- LÓGICA DE ESTUDO ---
 
 async function startStudySession(deckTag = null) {
     let cardsToReview;
@@ -335,19 +370,19 @@ async function startStudySession(deckTag = null) {
     if (state.isGuest) {
         cardsToReview = deckTag ? state.allCards.filter(c => c.tag === deckTag) : state.allCards;
     } else {
-        if (deckTag) {
-            cardsToReview = state.allCards.filter(c => c.tag === deckTag && new Date(c.nextReviewDate) <= new Date());
-        } else {
-            cardsToReview = await apiFetch('/cards/review-queue');
+        let reviewQueue = await apiFetch('/cards/review-queue');
+        if (reviewQueue.length === 0) {
+            reviewQueue = state.allCards.filter(c => c.status === 'learning');
         }
+        cardsToReview = deckTag ? reviewQueue.filter(c => c.tag === deckTag) : reviewQueue;
     }
 
     state.studyQueue = cardsToReview;
     state.currentStudyCardIndex = 0;
     
     if (state.studyQueue.length === 0) {
-        studyMessage.textContent = deckTag ? "Nenhum card para revisar neste baralho hoje." : "Você revisou tudo por hoje!";
-        setTimeout(() => studyMessage.textContent = '', 5000);
+        const message = deckTag ? "Nenhum card para revisar neste baralho hoje." : "Você revisou tudo por hoje!";
+        showTemporaryMessage(message, false, deckListMessage);
         return;
     }
 
@@ -369,12 +404,14 @@ function renderCurrentStudyCard() {
     cardQuestionContent.innerHTML = marked.parse(card.question);
     cardAnswerContent.innerHTML = marked.parse(card.answer);
 
+    studyCardSeparator.style.display = 'none';
     studyCardBack.style.display = 'none';
     gradeButtons.style.display = 'none';
     showAnswerBtn.style.display = 'block';
 }
 
 function handleShowAnswer() {
+    studyCardSeparator.style.display = 'block';
     studyCardBack.style.display = 'block';
     gradeButtons.style.display = 'flex';
     showAnswerBtn.style.display = 'none';
@@ -385,10 +422,14 @@ async function handleGradeCard(quality) {
 
     if (!state.isGuest) {
         try {
-            await apiFetch(`/cards/${card._id}/review`, {
+            const updatedCard = await apiFetch(`/cards/${card._id}/review`, {
                 method: 'POST',
                 body: { quality }
             });
+            const cardIndex = state.allCards.findIndex(c => c._id === card._id);
+            if (cardIndex > -1) {
+                state.allCards[cardIndex] = updatedCard.card;
+            }
         } catch (error) {
             console.error("Falha ao salvar a revisão:", error);
         }
@@ -435,12 +476,16 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         loginContainer.style.display = 'none';
         registerContainer.style.display = 'block';
+        loginForm.reset();
+        loginMessage.textContent = '';
     });
     
     showLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
         registerContainer.style.display = 'none';
         loginContainer.style.display = 'block';
+        registerForm.reset();
+        registerMessage.textContent = '';
     });
 
     // Navegação Principal
@@ -455,9 +500,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Navegação por Baralhos
     deckListContainer.addEventListener('click', (event) => {
-        const deckItem = event.target.closest('.deck-list__item');
-        if (deckItem) {
-            const tagName = deckItem.dataset.tag;
+        const studyLink = event.target.closest('.deck-list__study-link');
+        const configBtn = event.target.closest('.deck-list__config-btn');
+        
+        if (studyLink) {
+            const tagName = studyLink.dataset.tag;
+            startStudySession(tagName);
+        } else if (configBtn) {
+            const tagName = configBtn.dataset.tag;
             renderCardList(tagName);
             showMainView(cardListView);
         }
@@ -480,9 +530,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Submissão de Formulários de Criação
-    manualCardForm.addEventListener('submit', handleManualCardSubmit);
-    iaSingleForm.addEventListener('submit', handleIaSingleSubmit);
-    iaBulkForm.addEventListener('submit', handleIaBulkSubmit);
+    manualCardForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleCardSubmit(manualCardForm, '/cards');
+    });
+    iaSingleForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const endpoint = state.isGuest ? '/users/guest/generate-text' : '/cards/generate-text';
+        handleCardSubmit(iaSingleForm, endpoint);
+    });
+    iaBulkForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const endpoint = state.isGuest ? '/users/guest/generate-deck' : '/cards/generate-deck';
+        handleCardSubmit(iaBulkForm, endpoint);
+    });
 
     // Lógica da Tela de Estudo
     showAnswerBtn.addEventListener('click', handleShowAnswer);
@@ -495,72 +556,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check inicial
     checkInitialAuthState();
 });
-
-async function handleIaSingleSubmit(event) {
-    event.preventDefault();
-    const question = iaSingleForm.querySelector('#ia-question').value;
-    const tag = iaSingleForm.querySelector('#ia-single-tag').value;
-
-    if (state.isGuest) {
-        const newCard = { _id: `g${Date.now()}`, question, answer: "Resposta gerada por IA (simulação)", tag, status: 'new', nextReviewDate: new Date() };
-        state.allCards.push(newCard);
-        renderDecks(state.allCards);
-        populateTagDatalist();
-        showMainView(deckListView);
-        return;
-    }
-    
-    const button = iaSingleForm.querySelector('button[type="submit"]');
-    try {
-        button.textContent = 'Gerando...';
-        button.disabled = true;
-        await apiFetch('/cards/generate-text', {
-            method: 'POST',
-            body: { question, tag, detailLevel: 'medium', tone: 'neutral' }
-        });
-        iaSingleForm.reset();
-        await fetchAndRenderDecks();
-        showMainView(deckListView);
-    } catch (error) {
-        showTemporaryMessage(error.message, true);
-    } finally {
-        button.textContent = 'Gerar Card';
-        button.disabled = false;
-    }
-}
-
-async function handleIaBulkSubmit(event) {
-    event.preventDefault();
-    const topic = iaBulkForm.querySelector('#ia-bulk-topic').value;
-    const tag = iaBulkForm.querySelector('#ia-bulk-tag').value;
-    const count = iaBulkForm.querySelector('#ia-bulk-count').value;
-
-    if (state.isGuest) {
-        for (let i = 0; i < count; i++) {
-            const newCard = { _id: `g${Date.now() + i}`, question: `${topic} (Card ${i+1})`, answer: "Resposta gerada por IA (simulação)", tag, status: 'new', nextReviewDate: new Date() };
-            state.allCards.push(newCard);
-        }
-        renderDecks(state.allCards);
-        populateTagDatalist();
-        showMainView(deckListView);
-        return;
-    }
-
-    const button = iaBulkForm.querySelector('button[type="submit"]');
-    try {
-        button.textContent = 'Gerando Baralho...';
-        button.disabled = true;
-        await apiFetch('/cards/generate-deck', {
-            method: 'POST',
-            body: { topic, tag, count }
-        });
-        iaBulkForm.reset();
-        await fetchAndRenderDecks();
-        showMainView(deckListView);
-    } catch (error) {
-        showTemporaryMessage(error.message, true);
-    } finally {
-        button.textContent = 'Gerar Baralho';
-        button.disabled = false;
-    }
-}
