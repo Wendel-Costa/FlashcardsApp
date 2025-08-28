@@ -303,56 +303,28 @@ function showTemporaryMessage(message, isError = false, container = generationMe
     }, 5000);
 }
 
-async function handleCardSubmit(form, endpoint) {
+async function handleCardSubmit(form, endpoint, isBulk = false) {
     const button = form.querySelector('button[type="submit"]');
     const originalButtonText = button.textContent;
 
-    if (state.isGuest) {
-        const question = form.querySelector('input[id*="question"], textarea[id*="question"], input[id*="topic"]').value;
-        const answer = form.querySelector('textarea[id*="answer"]')?.value || "Resposta gerada por IA (simulação)";
-        const tag = form.querySelector('input[id*="tag"]').value;
-        const newCard = { _id: `g${Date.now()}`, question, answer, tag, status: 'new', nextReviewDate: new Date() };
-        
-        if (endpoint === '/users/guest/generate-deck') {
-            const topic = form.querySelector('input[id*="topic"]').value;
-            const count = form.querySelector('input[id*="count"]').value;
-            button.textContent = 'Gerando...';
-            button.disabled = true;
-            try {
-                const response = await apiFetch(endpoint, { method: 'POST', body: { topic, count } });
-                response.forEach(card => state.allCards.push({ ...card, _id: `g${Date.now()}` }));
-            } catch(e) {}
-            button.textContent = originalButtonText;
-            button.disabled = false;
-        } else if (endpoint === '/users/guest/generate-text') {
-            button.textContent = 'Gerando...';
-            button.disabled = true;
-            try {
-                const response = await apiFetch(endpoint, { method: 'POST', body: { question, tag } });
-                state.allCards.push({ ...response.card, _id: `g${Date.now()}` });
-            } catch(e) {}
-            button.textContent = originalButtonText;
-            button.disabled = false;
-        } else {
-             state.allCards.push(newCard);
-        }
-
-        renderDecks(state.allCards);
-        populateTagDatalist();
-        showMainView(deckListView);
-        return;
-    }
-
     try {
-        button.textContent = 'Enviando...';
-        button.disabled = true;
         const formData = new FormData(form);
         const body = Object.fromEntries(formData.entries());
-        await apiFetch(endpoint, { method: 'POST', body });
+
+        button.textContent = 'Enviando...';
+        button.disabled = true;
+
+        const result = await apiFetch(endpoint, { method: 'POST', body });
+
+        if (state.isGuest) {
+            const newCards = isBulk ? result.cards : [result.card];
+            newCards.forEach(card => state.allCards.push({ ...card, _id: `g${Date.now()}` }));
+        }
         
         form.reset();
         await fetchAndRenderDecks();
         showMainView(deckListView);
+
     } catch (error) {
         showTemporaryMessage(error.message, true, generationMessage);
     } finally {
@@ -542,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     iaBulkForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const endpoint = state.isGuest ? '/users/guest/generate-deck' : '/cards/generate-deck';
-        handleCardSubmit(iaBulkForm, endpoint);
+        handleCardSubmit(iaBulkForm, endpoint, true);
     });
 
     // Lógica da Tela de Estudo
