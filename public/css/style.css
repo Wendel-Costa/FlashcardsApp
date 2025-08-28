@@ -121,7 +121,8 @@ body {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     padding: 0.75rem;
     background-color: var(--bg-dark);
@@ -134,10 +135,20 @@ body {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--primary-accent);
     box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+}
+
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
+    background-color: var(--bg-dark);
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
 }
 
 .form-actions {
@@ -232,9 +243,14 @@ body {
     align-items: center;
 }
 
+.deck-list__main {
+    flex-grow: 1;
+}
+
 .deck-list__study-link {
     cursor: pointer;
     transition: color 0.2s;
+    display: inline-block;
 }
 .deck-list__study-link:hover {
     color: var(--primary-accent);
@@ -242,6 +258,7 @@ body {
 
 .deck-list__item-stats {
     display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     color: var(--text-secondary);
     margin-top: 0.5rem;
@@ -255,6 +272,7 @@ body {
     cursor: pointer;
     color: var(--text-secondary);
     transition: color 0.2s;
+    padding: 0.5rem;
 }
 .deck-list__config-btn:hover {
     color: var(--text-primary);
@@ -324,6 +342,7 @@ body {
 
 .study-card__content {
     font-size: 1.5rem;
+    width: 100%;
 }
 
 .study-card__separator {

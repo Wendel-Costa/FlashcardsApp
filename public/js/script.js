@@ -306,23 +306,28 @@ function showTemporaryMessage(message, isError = false, container = generationMe
 async function handleCardSubmit(form, endpoint, isBulk = false) {
     const button = form.querySelector('button[type="submit"]');
     const originalButtonText = button.textContent;
+    const formData = new FormData(form);
+    const body = Object.fromEntries(formData.entries());
 
     try {
-        const formData = new FormData(form);
-        const body = Object.fromEntries(formData.entries());
-
         button.textContent = 'Enviando...';
         button.disabled = true;
-
+        
         const result = await apiFetch(endpoint, { method: 'POST', body });
 
         if (state.isGuest) {
             const newCards = isBulk ? result.cards : [result.card];
-            newCards.forEach(card => state.allCards.push({ ...card, _id: `g${Date.now()}` }));
+            newCards.forEach(card => {
+                state.allCards.push({ ...card, _id: `g${Date.now()}`, status: 'new', nextReviewDate: new Date() })
+            });
         }
         
         form.reset();
-        await fetchAndRenderDecks();
+        
+        if (!state.isGuest) await fetchAndRenderDecks();
+        else renderDecks(state.allCards);
+
+        populateTagDatalist();
         showMainView(deckListView);
 
     } catch (error) {
@@ -343,6 +348,7 @@ async function startStudySession(deckTag = null) {
         cardsToReview = deckTag ? state.allCards.filter(c => c.tag === deckTag) : state.allCards;
     } else {
         let reviewQueue = await apiFetch('/cards/review-queue');
+        
         if (reviewQueue.length === 0) {
             reviewQueue = state.allCards.filter(c => c.status === 'learning');
         }
@@ -364,11 +370,15 @@ async function startStudySession(deckTag = null) {
 
 function renderCurrentStudyCard() {
     if (state.currentStudyCardIndex >= state.studyQueue.length) {
-        studyMessage.textContent = "Sessão de estudos concluída!";
-        setTimeout(() => {
+        studyMessage.textContent = "Sessão concluída! Voltando para a lista de baralhos...";
+        
+        setTimeout(async () => {
             studyMessage.textContent = '';
+            if (!state.isGuest) await fetchAndRenderDecks();
+            else renderDecks(state.allCards);
+            
             showMainView(deckListView);
-        }, 3000);
+        }, 2000);
         return;
     }
 
@@ -394,13 +404,13 @@ async function handleGradeCard(quality) {
 
     if (!state.isGuest) {
         try {
-            const updatedCard = await apiFetch(`/cards/${card._id}/review`, {
+            const response = await apiFetch(`/cards/${card._id}/review`, {
                 method: 'POST',
                 body: { quality }
             });
             const cardIndex = state.allCards.findIndex(c => c._id === card._id);
             if (cardIndex > -1) {
-                state.allCards[cardIndex] = updatedCard.card;
+                state.allCards[cardIndex] = response.card;
             }
         } catch (error) {
             console.error("Falha ao salvar a revisão:", error);

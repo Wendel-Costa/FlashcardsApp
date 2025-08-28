@@ -16,6 +16,40 @@ function addMinutes(date, minutes) {
 
 class CardController {
     
+    static async generateGuestCardByAI(req, res) {
+        const { question, tag, detailLevel, tone } = req.body;
+        try {
+            const aiResponse = await generateText(question, detailLevel, tone);
+            const newCard = {
+                question: question,
+                answer: aiResponse,
+                tag: tag,
+            };
+            res.status(201).json({ message: 'Card de visitante gerado com sucesso', card: newCard });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - falha ao gerar card de visitante` });
+        }
+    }
+
+    static async generateGuestDeckByAI(req, res) {
+        const { topic, count } = req.body;
+        try {
+            const aiResponseText = await generateDeckWithAI(topic, count);
+            let newCardsData;
+            try {
+                const cleanText = aiResponseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                newCardsData = JSON.parse(cleanText);
+            } catch (error) {
+                return res.status(500).json({ message: "A IA retornou uma resposta em um formato inválido." });
+            }
+            res.status(201).json({ message: `${count} cards de visitante criados com sucesso!`, cards: newCardsData });
+        } catch (error) {
+            res.status(500).json({ message: `${error.message} - falha ao gerar baralho de visitante` });
+        }
+    }
+
+
+
     static async generateDeckByAI(req, res) {
         const { topic, tag, count } = req.body;
         const userId = req.userId;
@@ -27,7 +61,6 @@ class CardController {
         try {
             const aiResponseText = await generateDeckWithAI(topic, count);
 
-            // Correção caso a IA não gere os dados da forma correta:
             let newCardsData;
             try {
                 const cleanText = aiResponseText.replace(/```json/g, '').replace(/```/g, '').trim();

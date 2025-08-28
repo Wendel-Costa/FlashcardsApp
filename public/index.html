@@ -143,6 +143,26 @@
                             <label for="ia-single-tag">Baralho (digite um novo ou selecione)</label>
                             <input type="text" id="ia-single-tag" name="tag" list="existing-tags" required>
                         </div>
+                        
+                        <div class="form-group">
+                            <label for="ia-tone">Tom da Resposta</label>
+                            <select id="ia-tone" name="tone" class="form-control">
+                                <option value="neutral" selected>Neutro</option>
+                                <option value="formal">Formal</option>
+                                <option value="informal">Informal</option>
+                                <option value="concise">Conciso</option>
+                                <option value="detailed">Detalhado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nível de Detalhes</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="detailLevel" value="low"> Baixo</label>
+                                <label><input type="radio" name="detailLevel" value="medium" checked> Médio</label>
+                                <label><input type="radio" name="detailLevel" value="high"> Alto</label>
+                            </div>
+                        </div>
+
                         <div class="form-actions">
                             <button type="button" class="btn btn--secondary cancel-add-btn">Cancelar</button>
                             <button type="submit" class="btn btn--primary">Gerar Card</button>

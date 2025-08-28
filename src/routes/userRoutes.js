@@ -6,8 +6,8 @@ import aiLimiter from "../middleware/rateLimiter.js";
 const routes = express.Router();
 
 // ROTAS DE VISITANTE
-routes.post("/guest/generate-text", aiLimiter, CardController.generateCardByAI);
-routes.post("/guest/generate-deck", aiLimiter, CardController.generateDeckByAI);
+routes.post("/guest/generate-text", aiLimiter, CardController.generateGuestCardByAI);
+routes.post("/guest/generate-deck", aiLimiter, CardController.generateGuestDeckByAI);
 
 
 // ROTAS DE CONTAS
