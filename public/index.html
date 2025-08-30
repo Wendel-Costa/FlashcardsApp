@@ -212,9 +212,18 @@
                 <div class="study-actions">
                     <button id="show-answer-btn" class="btn btn--primary">Mostrar Resposta</button>
                     <div id="grade-buttons" style="display: none;">
-                        <button class="btn btn--danger" data-quality="0">Errei</button>
-                        <button class="btn btn--warning" data-quality="3">Bom</button>
-                        <button class="btn btn--success" data-quality="5">Fácil</button>
+                        <div class="grade-button-group">
+                            <button class="btn btn--danger" data-quality="0">Errei</button>
+                            <span class="grade-interval" id="interval-0"></span>
+                        </div>
+                        <div class="grade-button-group">
+                            <button class="btn btn--warning" data-quality="3">Bom</button>
+                            <span class="grade-interval" id="interval-3"></span>
+                        </div>
+                        <div class="grade-button-group">
+                            <button class="btn btn--success" data-quality="5">Fácil</button>
+                            <span class="grade-interval" id="interval-5"></span>
+                        </div>
                     </div>
                 </div>
                  <div id="study-message" class="message"></div>

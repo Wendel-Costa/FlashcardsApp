@@ -61,6 +61,7 @@ const generationMessage = document.getElementById('generation-message');
 const existingTagsDatalist = document.getElementById('existing-tags');
 
 // Study View
+const studyCardContainer = document.querySelector('.study-card');
 const studyCardFront = document.getElementById('study-card-front');
 const studyCardBack = document.getElementById('study-card-back');
 const cardQuestionContent = document.getElementById('card-question-content');
@@ -70,6 +71,11 @@ const gradeButtons = document.getElementById('grade-buttons');
 const studyMessage = document.getElementById('study-message');
 const stopStudyBtn = document.getElementById('stop-study-btn');
 const studyCardSeparator = document.querySelector('.study-card__separator');
+const intervalSpans = {
+    0: document.getElementById('interval-0'),
+    3: document.getElementById('interval-3'),
+    5: document.getElementById('interval-5'),
+};
 
 // Edit Modal
 const editModal = document.getElementById('edit-modal');
@@ -198,8 +204,8 @@ function handleGuestMode(e) {
     initializeApp();
 
     state.allCards = [
-        { _id: 'g1', question: 'O que é HTML?', answer: 'É uma linguagem de marcação para criar páginas web.', tag: 'Tecnologia', status: 'new', nextReviewDate: new Date() },
-        { _id: 'g2', question: 'Qual a capital do Brasil?', answer: 'Brasília.', tag: 'Geografia', status: 'new', nextReviewDate: new Date() }
+        { _id: 'g1', question: 'O que é HTML?', answer: 'É uma linguagem de marcação para criar páginas web.', tag: 'Tecnologia', status: 'new', nextReviewDate: new Date(), easeFactor: 2.5, interval: 0 },
+        { _id: 'g2', question: 'Qual a capital do Brasil?', answer: 'Brasília.', tag: 'Geografia', status: 'new', nextReviewDate: new Date(), easeFactor: 2.5, interval: 0 }
     ];
     renderDecks(state.allCards);
     populateTagDatalist();
@@ -280,12 +286,12 @@ function renderCardList(tagName) {
     }
 
     cardListContainer.innerHTML = cardsInDeck.map(card => `
-        <div class="card-list-item">
+        <div class="card-list-item" data-card-id="${card._id}">
             <div class="card-list-item__content">${marked.parse(card.question)}</div>
             <div class="card-list-item__content">${marked.parse(card.answer)}</div>
             <div class="card-list-item__actions">
-                <button class="btn btn--secondary edit-card-btn" data-card-id="${card._id}">Editar</button>
-                <button class="btn btn--danger delete-card-btn" data-card-id="${card._id}">Apagar</button>
+                <button class="btn btn--secondary edit-card-btn">Editar</button>
+                <button class="btn btn--danger delete-card-btn">Apagar</button>
             </div>
         </div>
     `).join('');
@@ -316,9 +322,10 @@ async function handleCardSubmit(form, endpoint, isBulk = false) {
         const result = await apiFetch(endpoint, { method: 'POST', body });
 
         if (state.isGuest) {
+            const tag = body.tag;
             const newCards = isBulk ? result.cards : [result.card];
             newCards.forEach(card => {
-                state.allCards.push({ ...card, _id: `g${Date.now()}`, status: 'new', nextReviewDate: new Date() })
+                state.allCards.push({ ...card, tag, _id: `g${Date.now()}`, status: 'new', nextReviewDate: new Date() })
             });
         }
         
@@ -338,8 +345,106 @@ async function handleCardSubmit(form, endpoint, isBulk = false) {
     }
 }
 
+// --- EDIÇÃO E EXCLUSÃO DE CARDS ---
+
+function openEditModal(card) {
+    editModal.style.display = 'flex';
+    editCardForm.querySelector('#edit-card-id').value = card._id;
+    editCardForm.querySelector('#edit-question').value = card.question;
+    editCardForm.querySelector('#edit-answer').value = card.answer;
+}
+
+function closeEditModal() {
+    editModal.style.display = 'none';
+    editCardForm.reset();
+}
+
+async function handleUpdateCard(event) {
+    event.preventDefault();
+    const cardId = editCardForm.querySelector('#edit-card-id').value;
+    const question = editCardForm.querySelector('#edit-question').value;
+    const answer = editCardForm.querySelector('#edit-answer').value;
+
+    if(state.isGuest) {
+        const cardIndex = state.allCards.findIndex(c => c._id === cardId);
+        if(cardIndex > -1) {
+            state.allCards[cardIndex].question = question;
+            state.allCards[cardIndex].answer = answer;
+        }
+        renderCardList(state.allCards[cardIndex].tag);
+        closeEditModal();
+        return;
+    }
+
+    try {
+        await apiFetch(`/cards/${cardId}`, {
+            method: 'PUT',
+            body: { question, answer }
+        });
+        const cardIndex = state.allCards.findIndex(c => c._id === cardId);
+        if (cardIndex > -1) {
+            state.allCards[cardIndex].question = question;
+            state.allCards[cardIndex].answer = answer;
+        }
+        renderCardList(state.allCards[cardIndex].tag);
+        closeEditModal();
+    } catch(error) {
+        alert("Falha ao atualizar o card.");
+    }
+}
+
+async function handleDeleteCard(cardId) {
+    const card = state.allCards.find(c => c._id === cardId);
+    if (!confirm(`Tem certeza que deseja apagar o card: "${card.question}"?`)) {
+        return;
+    }
+
+    if(state.isGuest) {
+        state.allCards = state.allCards.filter(c => c._id !== cardId);
+        renderCardList(card.tag);
+        return;
+    }
+
+    try {
+        await apiFetch(`/cards/${cardId}`, { method: 'DELETE' });
+        state.allCards = state.allCards.filter(c => c._id !== cardId);
+        renderCardList(card.tag);
+        renderDecks(state.allCards);
+    } catch(error) {
+        alert("Falha ao apagar o card.");
+    }
+}
+
 
 // --- LÓGICA DE ESTUDO ---
+
+function formatInterval(days) {
+    if (days < 1) return "<10m";
+    if (days < 30) return `${days}d`;
+    const months = (days / 30).toFixed(1);
+    return `${months}m`;
+}
+
+function calculateNextInterval(card, quality) {
+    if (quality < 3) return "<10m";
+
+    let easeFactor = card.easeFactor || 2.5;
+    let interval = card.interval || 0;
+    let status = card.status || 'new';
+
+    let newEaseFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if (newEaseFactor < 1.3) newEaseFactor = 1.3;
+
+    let newInterval;
+    if (status === 'learning' || interval === 0) {
+        newInterval = 1;
+    } else if (interval === 1) {
+        newInterval = 6;
+    } else {
+        newInterval = Math.ceil(interval * newEaseFactor);
+    }
+    return formatInterval(newInterval);
+}
 
 async function startStudySession(deckTag = null) {
     let cardsToReview;
@@ -348,7 +453,6 @@ async function startStudySession(deckTag = null) {
         cardsToReview = deckTag ? state.allCards.filter(c => c.tag === deckTag) : state.allCards;
     } else {
         let reviewQueue = await apiFetch('/cards/review-queue');
-        
         if (reviewQueue.length === 0) {
             reviewQueue = state.allCards.filter(c => c.status === 'learning');
         }
@@ -369,14 +473,15 @@ async function startStudySession(deckTag = null) {
 }
 
 function renderCurrentStudyCard() {
+    studyCardContainer.style.display = 'flex';
+
     if (state.currentStudyCardIndex >= state.studyQueue.length) {
         studyMessage.textContent = "Sessão concluída! Voltando para a lista de baralhos...";
+        studyCardContainer.style.display = 'none';
         
-        setTimeout(async () => {
+        setTimeout(() => {
             studyMessage.textContent = '';
-            if (!state.isGuest) await fetchAndRenderDecks();
-            else renderDecks(state.allCards);
-            
+            renderDecks(state.allCards);
             showMainView(deckListView);
         }, 2000);
         return;
@@ -385,6 +490,10 @@ function renderCurrentStudyCard() {
     const card = state.studyQueue[state.currentStudyCardIndex];
     cardQuestionContent.innerHTML = marked.parse(card.question);
     cardAnswerContent.innerHTML = marked.parse(card.answer);
+
+    intervalSpans[0].textContent = calculateNextInterval(card, 0);
+    intervalSpans[3].textContent = calculateNextInterval(card, 3);
+    intervalSpans[5].textContent = calculateNextInterval(card, 5);
 
     studyCardSeparator.style.display = 'none';
     studyCardBack.style.display = 'none';
@@ -400,7 +509,7 @@ function handleShowAnswer() {
 }
 
 async function handleGradeCard(quality) {
-    const card = state.studyQueue[state.currentStudyCardIndex];
+    let card = state.studyQueue[state.currentStudyCardIndex];
 
     if (!state.isGuest) {
         try {
@@ -415,9 +524,21 @@ async function handleGradeCard(quality) {
         } catch (error) {
             console.error("Falha ao salvar a revisão:", error);
         }
+    } else {
+        // Simula a atualização para o modo visitante
+        const cardIndex = state.allCards.findIndex(c => c._id === card._id);
+        if(cardIndex > -1) {
+            state.allCards[cardIndex].status = 'reviewing';
+        }
     }
-    
-    state.currentStudyCardIndex++;
+
+    if(quality < 3) {
+        const lapsedCard = state.studyQueue.splice(state.currentStudyCardIndex, 1)[0];
+        state.studyQueue.push(lapsedCard);
+    } else {
+        state.currentStudyCardIndex++;
+    }
+
     renderCurrentStudyCard();
 }
 
@@ -475,8 +596,8 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelAddButtons.forEach(btn => btn.addEventListener('click', () => showMainView(deckListView)));
     backToDecksBtn.addEventListener('click', () => showMainView(deckListView));
     startStudyBtn.addEventListener('click', () => startStudySession());
-    stopStudyBtn.addEventListener('click', async () => {
-        await fetchAndRenderDecks();
+    stopStudyBtn.addEventListener('click', () => {
+        renderDecks(state.allCards);
         showMainView(deckListView);
     });
 
@@ -492,6 +613,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const tagName = configBtn.dataset.tag;
             renderCardList(tagName);
             showMainView(cardListView);
+        }
+    });
+
+    // Listener para Editar e Apagar na lista de cards
+    cardListContainer.addEventListener('click', (event) => {
+        const editBtn = event.target.closest('.edit-card-btn');
+        const deleteBtn = event.target.closest('.delete-card-btn');
+        
+        if(editBtn) {
+            const cardId = editBtn.closest('.card-list-item').dataset.cardId;
+            const card = state.allCards.find(c => c._id === cardId);
+            openEditModal(card);
+        }
+
+        if(deleteBtn) {
+            const cardId = deleteBtn.closest('.card-list-item').dataset.cardId;
+            handleDeleteCard(cardId);
         }
     });
 
@@ -526,6 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const endpoint = state.isGuest ? '/users/guest/generate-deck' : '/cards/generate-deck';
         handleCardSubmit(iaBulkForm, endpoint, true);
     });
+    
+    // Modal de Edição
+    editCardForm.addEventListener('submit', handleUpdateCard);
+    cancelEditBtn.addEventListener('click', closeEditModal);
+
 
     // Lógica da Tela de Estudo
     showAnswerBtn.addEventListener('click', handleShowAnswer);
