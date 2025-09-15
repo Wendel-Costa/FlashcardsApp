@@ -18,7 +18,7 @@ Deploy: https://apiflashcards.vercel.app/
 * **Backend:** Node.js, Express
 * **Banco de Dados:** MongoDB, Mongoose
 * **Inteligência Artificial:** Gemini API (`@google/generative-ai`)
-* **Outros:** dotenv, cors, nodemon
+* **Outros:** dotenv, cors, nodemon, JSON Web Token
 
 ## Como Usar
 
@@ -33,9 +33,8 @@ Deploy: https://apiflashcards.vercel.app/
 
 ## Melhorias Futuras
 
-* Implementação de diferentes tipos de flashcards (múltipla escolha, completar lacunas, etc.).
-* Opção para editar flashcards existentes.
+* Atualização no estilo do site
+* Operação do frontend usando react.js
 * Funcionalidade de busca e filtragem de flashcards por tags.
 * Integração com outras APIs de IA para diferentes funcionalidades.
-* Personalização da interface do estudo Anki.
 * Estatísticas de estudo para acompanhar o progresso do usuário.
