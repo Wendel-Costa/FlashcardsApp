@@ -110,11 +110,11 @@ class CardController {
 
             } else {
                 let newInterval;
-                let newEaseFactor = cardToReview.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); // cálculo da repetição espaçada
+                let newEaseFactor = cardToReview.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
 
                 if (newEaseFactor < 1.3) {
                     newEaseFactor = 1.3;
-                } // não pode ser menor que 1.3 (pela regra geral da repetição espaçada)
+                }
                 
                 cardToReview.easeFactor = newEaseFactor;
                 

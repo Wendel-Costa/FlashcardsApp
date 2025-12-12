@@ -1,4 +1,3 @@
-// src/middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import User from '../models/User.js';
@@ -24,8 +23,8 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized: User not found.' });
         }
 
-        req.userId = decoded.userId; // Adiciona o ID do usuário ao objeto?
-        next(); // Permite que a requisição continue para a próxima função (rota)
+        req.userId = decoded.userId;
+        next();
     } catch (error) {
         return res.status(401).json({ message: 'Unauthorized: Invalid token.' });
     }
