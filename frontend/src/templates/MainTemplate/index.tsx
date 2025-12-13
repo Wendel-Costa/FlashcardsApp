@@ -9,9 +9,7 @@ type MainTemplateProps = {
 export function MainTemplate({ children }: MainTemplateProps) {
    return (
       <>
-         <Container>
-            <Header />
-         </Container>
+         <Header />
 
          <Container>
             {children}
