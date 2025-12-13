@@ -1,10 +1,12 @@
 import './styles/theme.css';
 import './styles/global.css';
+import { Footer } from './components/Footer';
 
 function App() {
   return (
     <>
-    <p>oi</p>
+      <p>Oi</p>
+      <Footer />
     </>
   )
 }
