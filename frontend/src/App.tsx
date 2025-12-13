@@ -1,9 +1,10 @@
-import './App.css'
+import './styles/theme.css';
+import './styles/global.css';
 
 function App() {
   return (
     <>
-    oi
+    <p>oi</p>
     </>
   )
 }

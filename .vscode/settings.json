@@ -1,0 +1,31 @@
+{
+   "breadcrumbs.enabled": false,
+   "files.eol": "\n",
+
+   // 🛠 Formatação e Lint
+
+   "editor.defaultFormatter": "esbenp.prettier-vscode",
+   "editor.formatOnSave": true,
+   "editor.tabSize": 3,
+   "explorer.compactFolders": false,
+
+   "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+   },
+
+   "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   },
+   "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   },
+   "[xml]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   },
+   "[svg]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   },
+   "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   }
+}
