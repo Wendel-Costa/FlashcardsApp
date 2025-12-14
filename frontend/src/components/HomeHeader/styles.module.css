@@ -1,4 +1,71 @@
 .homeHeader {
    display: flex;
-   background-color: red;
+   align-items: center;
+   gap: 2rem;
+   padding-right: 1rem;
+}
+
+.buttonCard {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   gap: 0.3rem;
+
+   padding: 1rem;
+   border-radius: 1rem;
+   text-decoration: none;
+
+   color: var(--text-over-primary-dark);
+   background-color: var(--primary);
+}
+
+.buttonCardAI {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 0.5rem;
+
+   padding: 1rem;
+   border-radius: 1rem;
+   text-decoration: none;
+
+   color: var(--text-over-primary-dark);
+   background: linear-gradient(135deg, var(--primary), var(--info));
+}
+
+.buttonOut {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 0.3rem;
+
+   padding: 1rem 2rem;
+   border-radius: 1rem;
+
+   font-size: 1.5rem;
+   text-decoration: none;
+   color: var(--error);
+
+
+}
+
+svg {
+   width: 2rem;
+   height: 2rem;
+}
+
+.buttonCard:hover {
+   transition: all 0.2s;
+   background-color: var(--primary-dark);
+}
+
+.buttonCardAI:hover {
+   transition: all 0.2s;
+   background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark));
+}
+
+.buttonOut:hover {
+   transition: all 0.2s;
+   background-color: var(--out-hover);
 }

@@ -9,9 +9,9 @@
    --gray-800: #181f2e;
    --gray-900: #0a0f1a;
 
-   --primary-light: #60a5fa;
-   --primary: #2563eb;
-   --primary-dark: #1e40af;
+   --primary-light: #c084fc;
+   --primary: #9333ea;
+   --primary-dark: #6817af;
 
    --text-over-primary: #0a0f1a;
    --text-over-primary-dark: #e6e9f0;
@@ -24,9 +24,16 @@
    --text-default: #0a0f1a;
    --text-muted: #272f43;
 
-   --link-hover: #0056b3;
-   --link-color: #2563eb;
+   --link-hover: #7e22ce;
+   --link-color: #9333ea;
 
    --disabled: #555f7d;
    --text-disabled: #aab3cc;
+
+   --success: #22c55e;
+   --warning: #eab308;
+   --error: #d00c0c;
+   --info: #f755dc;
+
+   --out-hover: #fe39391b;
 }
