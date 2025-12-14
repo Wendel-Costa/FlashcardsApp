@@ -1,6 +1,6 @@
 import styles from './styles.module.css'
 
-export function Header() {
+export function Logo() {
    return (
       <div className={styles.header}>
          <div className={styles.logo}>
