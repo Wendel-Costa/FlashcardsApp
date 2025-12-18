@@ -32,6 +32,9 @@
 
    color: var(--text-over-primary-dark);
    background: linear-gradient(135deg, var(--primary), var(--info));
+
+   background-size: 200% 200%;
+   background-position: left;
 }
 
 .buttonOut {
@@ -56,16 +59,16 @@ svg {
 }
 
 .buttonCard:hover {
-   transition: all 0.2s;
    background-color: var(--primary-dark);
+   transition: all 0.2s;
 }
 
 .buttonCardAI:hover {
-   transition: all 0.2s;
-   background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark));
+   transition: background-position 0.2s;
+   background-position: right;
 }
 
 .buttonOut:hover {
-   transition: all 0.2s;
    background-color: var(--out-hover);
+   transition: all 0.2s;
 }
