@@ -1,4 +1,7 @@
 :root {
+   --background: #efefef;
+   --secondBackground: #f8f8f8;
+
    --gray-100: #e6e9f0;
    --gray-200: #cdd3e1;
    --gray-300: #aab3cc;
@@ -16,10 +19,6 @@
    --text-over-primary: #0a0f1a;
    --text-over-primary-dark: #e6e9f0;
    --text-over-primary-light: #0a0f1a;
-   --text-over-success: #0a0f1a;
-   --text-over-warning: #0a0f1a;
-   --text-over-error: #e6e9f0;
-   --text-over-info: #0a0f1a;
 
    --text-default: #0a0f1a;
    --text-muted: #272f43;
@@ -31,9 +30,12 @@
    --text-disabled: #aab3cc;
 
    --success: #22c55e;
+   --action: #0d82e2;
    --warning: #eab308;
    --error: #d00c0c;
    --info: #f755dc;
 
    --out-hover: #fe39391b;
+   --action-hover: #260de2;
+   --negative-action-hover: #a40000;
 }

@@ -1,0 +1,52 @@
+.block {
+   background-color: var(--secondBackground);
+
+   width: 30rem;
+   height: 15rem;
+   margin: 3rem 5rem;
+
+   border-radius: 1rem;
+   box-shadow: 0 2px 4px var(--gray-300);
+
+   display: flex;
+   flex-direction: column;
+}
+
+.deckName {
+   margin: 2rem;
+   font-weight: 500;
+}
+
+.buttonsDiv {
+   margin-top: auto;
+   border-radius: 0 0 1rem 1rem;
+   border-top: solid var(--gray-200) 1px;
+
+   width: 100%;
+   height: 4rem;
+   background-color: var(--gray-100);
+   padding-right: 2rem;
+
+   display: flex;
+   justify-content: end;
+   align-items: center;
+   gap: 1rem;
+}
+
+.button {
+   color: var(--action);
+}
+
+.buttonTrash {
+   color: var(--error);
+}
+
+.button:hover {
+   color: var(--action-hover);
+   transition: all 0.2s;
+}
+
+.buttonTrash:hover {
+   color: var(--negative-action-hover);
+   transition: all 0.2s;
+}
