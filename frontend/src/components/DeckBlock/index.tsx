@@ -9,6 +9,7 @@ export function DeckBlock(props: DeckBlockProps) {
    return (
       <div className={styles.block}>
          <p className={styles.deckName}>{props.deckName}</p>
+         <p className={styles.cardsRemaining}>{`15 cards`}</p>
          <div className={styles.buttonsDiv}>
             <a href="" className={styles.button}>
                <Eye />
