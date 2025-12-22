@@ -1,0 +1,9 @@
+.block {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   margin-top: 2rem;
+
+   min-height: 25rem;
+}
