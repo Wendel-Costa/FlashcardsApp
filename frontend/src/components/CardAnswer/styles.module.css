@@ -1,0 +1,30 @@
+.answerContainer {
+   background-color: var(--gray-200);
+   box-shadow: 0 0 1rem var(--gray-500);
+
+   gap: 1rem;
+
+   width: 50%;
+   min-height: 25rem;
+
+   border-radius: 1rem;
+}
+
+.answer {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+
+   margin: 0 3rem 2rem 3rem;
+   text-align: center;
+
+   font-size: 2rem;
+}
+
+p {
+   height: 3rem;
+   margin: 2rem 2rem 0 2rem;
+
+   font-size: 1.5rem;
+   color: var(--primary);
+}
