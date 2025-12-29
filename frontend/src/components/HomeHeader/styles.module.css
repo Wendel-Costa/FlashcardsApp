@@ -18,6 +18,8 @@
 
    color: var(--text-over-primary-dark);
    background-color: var(--primary);
+
+   height: 5rem;
 }
 
 .buttonCardAI {
@@ -35,6 +37,8 @@
 
    background-size: 200% 200%;
    background-position: left;
+
+   height: 5rem;
 }
 
 .buttonOut {
@@ -50,10 +54,10 @@
    text-decoration: none;
    color: var(--error);
 
-
+   height: 5rem;
 }
 
-svg {
+.homeHeader svg {
    width: 2rem;
    height: 2rem;
 }

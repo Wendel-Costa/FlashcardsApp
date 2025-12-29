@@ -8,17 +8,17 @@ export function HomeHeader() {
          <div className={styles.homeHeader}>
             <a href="" className={styles.buttonCard}>
                <Plus />
-               <p>Criar Card</p>
+               <div>Criar Card</div>
             </a>
 
             <a href="" className={styles.buttonCardAI}>
                <Sparkles />
-               <p>Criar Card Com IA</p>
+               <div>Criar Card Com IA</div>
             </a>
 
             <a href="" className={styles.buttonOut}>
                <LogOut />
-               <p>Sair</p>
+               <div>Sair</div>
             </a>
          </div>
       </DefaultHeader>
