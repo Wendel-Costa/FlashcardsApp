@@ -1,3 +1,4 @@
+import styles from './styles.module.css'
 import { Container } from "../../components/Container"
 import { Footer } from "../../components/Footer"
 
@@ -7,12 +8,14 @@ type MainTemplateProps = {
 
 export function MainTemplate({ children }: MainTemplateProps) {
    return (
-      <>
-         {children}
+      <div className={styles.mainTemplate}>
+         <div className={styles.content}>
+            {children}
+         </div>
 
          <Container>
             <Footer />
          </Container>
-      </>
+      </div>
    )
 }
