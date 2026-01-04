@@ -37,10 +37,16 @@
 
    color: var(--disabled);
 
-   height: 10rem;
+   height: 4rem;
 }
 
 svg {
    width: 2rem;
    height: 2rem;
+}
+
+.return:hover {
+   color: var(--action-hover);
+   transition: all 0.2s;
+   cursor: pointer;
 }

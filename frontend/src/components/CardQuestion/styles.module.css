@@ -1,6 +1,6 @@
 .questionContainer {
    background-color: var(--secondBackground);
-   box-shadow: 0 0 1rem var(--gray-500);
+
 
    gap: 1rem;
 
@@ -27,4 +27,9 @@ p {
 
    font-size: 1.5rem;
    color: var(--primary);
+}
+
+.questionContainer:hover {
+   box-shadow: 0 0 1rem var(--gray-500);
+   transition: all 0.2s;
 }
