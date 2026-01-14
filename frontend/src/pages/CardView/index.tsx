@@ -10,7 +10,7 @@ export function CardView() {
          <CardViewHeader deckName="Matemática" />
          <CardQuestion>Pergunta</CardQuestion>
          <CardAnswer>Resposta</CardAnswer>
-         <OptionsAnswers DaysWhenBad={2} DaysWhenGood={1} />
+         <OptionsAnswers daysWhenWrong={2} daysWhenCorrect={10} daysWhenHard={1} />
       </MainTemplate>
    )
 }

@@ -1,14 +1,16 @@
+import { AnswerButton } from '../AnswersButton'
 import styles from './styles.module.css'
 
 type OptionsAnswersProps = {
-   DaysWhenGood: number,
-   DaysWhenBad: number
+   daysWhenCorrect: number,
+   daysWhenWrong: number,
+   daysWhenHard: number
 }
 
-export function OptionsAnswers({ DaysWhenBad, DaysWhenGood }: OptionsAnswersProps) {
+export function OptionsAnswers({ daysWhenWrong, daysWhenCorrect, daysWhenHard }: OptionsAnswersProps) {
    return (
       <div className={styles.options}>
-         {DaysWhenBad} {DaysWhenGood}
+         <AnswerButton days={daysWhenCorrect} type='Correto' />
       </div>
    )
 }
