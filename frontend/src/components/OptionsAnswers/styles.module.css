@@ -1,0 +1,9 @@
+.options {
+   background-color: red;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   margin: 2rem 35rem 0 35rem;
+   height: 5rem;
+}
