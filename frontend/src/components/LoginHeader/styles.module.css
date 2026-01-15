@@ -1,0 +1,10 @@
+.text {
+   color: var(--action);
+   text-decoration: none;
+}
+
+.text:hover {
+   color: var(--action-hover);
+   transition: all 0.2s;
+   cursor: pointer;
+}
