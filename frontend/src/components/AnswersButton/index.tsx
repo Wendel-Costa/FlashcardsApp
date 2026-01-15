@@ -8,7 +8,11 @@ type AnswerButtonProps = {
 export function AnswerButton({ days, type }: AnswerButtonProps) {
    return (
       <div className={styles.button}>
-         {type} {days}
+         <div className={styles.text}>
+            <span className={styles.type}>{type}</span>
+            <span className={styles.days}>{days}dias</span>
+         </div>
       </div>
+
    )
 }

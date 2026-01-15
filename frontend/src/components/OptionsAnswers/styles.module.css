@@ -1,8 +1,8 @@
 .options {
-   background-color: red;
    display: flex;
    align-items: center;
    justify-content: center;
+   gap: 2rem;
 
    margin: 2rem 35rem 0 35rem;
    height: 5rem;

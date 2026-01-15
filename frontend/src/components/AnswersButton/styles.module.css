@@ -1,0 +1,34 @@
+.button {
+   background-color: var(--action);
+   width: 12rem;
+   height: 4.5rem;
+
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   border-radius: 1rem;
+}
+
+.text {
+   display: flex;
+   align-items: baseline;
+   gap: 0.4rem;
+}
+
+.type {
+   font-size: 1.6rem;
+   font-weight: 500;
+
+}
+
+.days {
+   font-size: 1.1rem;
+   color: var(--text-disabled);
+}
+
+.button:hover {
+   background-color: var(--action-hover);
+   transition: all 0.2s;
+   cursor: pointer;
+}
