@@ -1,0 +1,17 @@
+.container {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 4rem 2rem 0 2rem;
+}
+
+.content {
+   background-color: var(--secondBackground);
+
+   height: 50rem;
+   width: 70rem;
+
+   display: flex;
+   justify-content: center;
+   border-radius: 2rem;
+}
