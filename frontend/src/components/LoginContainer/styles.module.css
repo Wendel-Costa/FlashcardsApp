@@ -15,3 +15,9 @@
    justify-content: center;
    border-radius: 2rem;
 }
+
+.title {
+   margin: 1rem;
+   font-size: 2rem;
+   color: var(--disabled);
+}
