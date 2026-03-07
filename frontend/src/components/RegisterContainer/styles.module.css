@@ -1,0 +1,28 @@
+.container {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 4rem 2rem 0 2rem;
+}
+
+.content {
+   background-color: var(--secondBackground);
+
+   height: 50rem;
+   width: 40rem;
+   max-width: 95%;
+   padding: 0 1rem;
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 1rem;
+
+   border-radius: 2rem;
+}
+
+.title {
+   margin: 1rem;
+   font-size: 3rem;
+   color: var(--primary);
+}
