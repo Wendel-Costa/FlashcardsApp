@@ -46,7 +46,7 @@ export function LoginForm() {
                placeholder="Sua senha" disabled={isLoading} />
          </div>
 
-         {error && <p className={styles.error}>{error}</p>}
+         {error && <div className={styles.error}>{error}</div>}
 
          <button type="submit" className={styles.button} disabled={isLoading}>
             {isLoading ? 'Entrando...' : 'Entrar'}

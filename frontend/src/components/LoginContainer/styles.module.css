@@ -8,16 +8,21 @@
 .content {
    background-color: var(--secondBackground);
 
-   height: 50rem;
-   width: 70rem;
+   height: 45rem;
+   width: 40rem;
+   max-width: 95%;
+   padding: 0 1rem;
 
    display: flex;
-   justify-content: center;
+   flex-direction: column;
+   align-items: center;
+   gap: 1rem;
+
    border-radius: 2rem;
 }
 
 .title {
    margin: 1rem;
-   font-size: 2rem;
-   color: var(--disabled);
+   font-size: 3rem;
+   color: var(--primary);
 }
