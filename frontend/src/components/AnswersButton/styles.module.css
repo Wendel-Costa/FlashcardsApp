@@ -1,34 +1,35 @@
 .button {
    background-color: var(--action);
-   width: 12rem;
-   height: 4.5rem;
+   width: 13rem;
+   height: 5rem;
 
    display: flex;
    justify-content: center;
    align-items: center;
 
    border-radius: 1rem;
+   cursor: pointer;
+   border: none;
 }
 
 .text {
    display: flex;
    align-items: baseline;
-   gap: 0.4rem;
+   gap: 0.5rem;
 }
 
 .type {
-   font-size: 1.6rem;
-   font-weight: 500;
-
+   font-size: 1.5rem;
+   font-weight: 600;
+   color: var(--text-over-primary-dark);
 }
 
 .days {
    font-size: 1.1rem;
-   color: var(--text-disabled);
+   color: var(--gray-200);
 }
 
 .button:hover {
    background-color: var(--action-hover);
    transition: all 0.2s;
-   cursor: pointer;
 }

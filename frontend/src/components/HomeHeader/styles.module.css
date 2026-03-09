@@ -16,7 +16,7 @@
    border-radius: 1rem;
    text-decoration: none;
 
-   color: var(--text-over-primary-dark);
+   color: var(--text-over-primary);
    background-color: var(--primary);
 
    height: 5rem;
@@ -35,7 +35,7 @@
    border-radius: 1rem;
    text-decoration: none;
 
-   color: var(--text-over-primary-dark);
+   color: var(--text-over-primary);
    background: linear-gradient(135deg, var(--primary), var(--info));
 
    background-size: 200% 200%;
@@ -72,18 +72,18 @@
 }
 
 .buttonCard:hover {
-   background-color: var(--primary-dark);
+   background-color: var(--action);
    cursor: pointer;
    transition: all 0.2s;
-   color: var(--text-over-primary);
+   color: var(--text-over-primary-dark);
    font-weight: 600;
 }
 
 .buttonCardAI:hover {
    transition: all 0.2s;
    cursor: pointer;
-   background-position: right;
-   color: var(--text-over-primary);
+   background: linear-gradient(135deg, var(--action), var(--info));
+   color: var(--text-over-primary-dark);
    font-weight: 600;
 }
 

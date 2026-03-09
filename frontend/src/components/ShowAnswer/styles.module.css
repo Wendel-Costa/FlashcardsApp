@@ -1,0 +1,22 @@
+.block {
+   display: flex;
+   justify-content: center;
+   margin-top: 2rem;
+}
+
+button {
+   width: 15rem;
+   height: 5rem;
+   background-color: var(--primary);
+   border: none;
+   border-radius: 1rem;
+   cursor: pointer;
+   font-weight: 600;
+}
+
+button:hover {
+   background-color: var(--action);
+   color: var(--text-over-primary-dark);
+   font-weight: 600;
+   transition: all 0.2s;
+}
