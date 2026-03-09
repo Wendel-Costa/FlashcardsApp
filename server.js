@@ -1,6 +1,6 @@
-import express from "express";
-import connectToDatabase from "./src/config/dbConnect.js";
-import routes from "./src/routes/index.js";
+import express from 'express';
+import connectToDatabase from './src/config/dbConnect.js';
+import routes from './src/routes/index.js';
 import cors from 'cors';
 
 const app = express();
@@ -16,5 +16,5 @@ const port = process.env.PORT || 3000;
 connectToDatabase();
 
 app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+   console.log(`Servidor aberto na porta ${port}`);
 });

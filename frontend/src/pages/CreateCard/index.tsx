@@ -33,7 +33,8 @@ export function CreateCard() {
          setSuccess('Card criado com sucesso!');
          setTimeout(() => navigate('/'), 1500);
       } catch (err: any) {
-         setError(err.response?.data?.message || 'Erro ao criar card');
+         console.log(err);
+         setError('Erro ao criar card');
       } finally { setIsLoading(false); }
    }
 
@@ -104,7 +105,7 @@ export function CreateCard() {
 
                   {success && <p className={styles.success}>{success}</p>}
 
-                  <button type="submit" className={styles.submitButton} disabled={isLoading}>{isLoading ? 'Gerando resposta...' : 'Gerar resposta'}</button>
+                  <button type="submit" className={styles.submitButton} disabled={isLoading}>{isLoading ? 'Gerando...' : 'Gerar resposta'}</button>
                </form>
             )}
          </div>

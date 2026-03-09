@@ -1,0 +1,184 @@
+.page {
+   max-width: 65rem;
+   margin: 0 auto;
+   padding: 3rem 2rem;
+}
+
+.header {
+   display: flex;
+   height: 7rem;
+}
+
+.back {
+   background: none;
+   border: none;
+   cursor: pointer;
+   font-size: 1.5rem;
+   color: var(--primary);
+   padding: 0.5rem 0;
+   margin-bottom: 2rem;
+   display: flex;
+   align-items: center;
+   gap: 0.5rem;
+   width: 8rem;
+}
+
+.back:hover {
+   opacity: 0.75;
+   transition: all 0.2s;
+}
+
+.title {
+   font-size: 2.8rem;
+   font-weight: 700;
+   margin: 0 0 2.5rem 13rem;
+   color: var(--text-default);
+}
+
+.subtitle {
+   font-size: 1.5rem;
+   color: var(--text-muted);
+   margin-bottom: 3rem;
+}
+
+.form {
+   background-color: var(--secondBackground);
+   border-radius: 1rem;
+   padding: 3rem;
+   box-shadow: 0 1px 3px var(--gray-200);
+   display: flex;
+   flex-direction: column;
+   gap: 2rem;
+}
+
+.field {
+   display: flex;
+   flex-direction: column;
+   gap: 0.8rem;
+}
+
+.field label {
+   font-size: 1.4rem;
+   font-weight: 600;
+   color: var(--text-muted);
+   display: flex;
+   flex-direction: column;
+   gap: 0.8rem;
+}
+
+.field input {
+   padding: 1.2rem;
+   border-radius: 0.8rem;
+   border: 1.5px solid var(--gray-200);
+   background-color: var(--background);
+   font-size: 1.5rem;
+   color: var(--text-default);
+}
+
+.field input:focus {
+   outline: none;
+   border-color: var(--primary);
+}
+
+.error {
+   color: var(--error);
+   font-size: 1.4rem;
+}
+
+.submitButton {
+   padding: 1.4rem;
+   border-radius: 1rem;
+   border: none;
+   cursor: pointer;
+   font-size: 1.6rem;
+   font-weight: 600;
+   color: var(--text-over-primary-dark);
+   background: linear-gradient(135deg, var(--primary), var(--info));
+   background-size: 200% 200%;
+   background-position: left;
+   margin-top: 1rem;
+}
+
+.submitButton:hover:not(:disabled) {
+   background-position: right;
+   transition: background-position 0.3s;
+}
+
+.submitButton:disabled {
+   background: var(--disabled);
+   cursor: not-allowed;
+}
+
+/* Tela de resultado */
+.resultPage {
+   max-width: 80rem;
+   margin: 0 auto;
+   padding: 3rem 2rem;
+}
+
+.successTitle {
+   font-size: 2.4rem;
+   font-weight: 700;
+   margin-bottom: 2.5rem;
+   color: var(--success);
+}
+
+.cardsList {
+   display: flex;
+   flex-direction: column;
+   gap: 1.5rem;
+   margin-bottom: 3rem;
+}
+
+.cardPreview {
+   background-color: var(--secondBackground);
+   border: 1px solid var(--gray-100);
+   border-radius: 1rem;
+   padding: 2rem;
+   box-shadow: 0 1px 3px var(--gray-200);
+}
+
+.cardPreview p {
+   font-size: 1.5rem;
+   line-height: 1.6;
+}
+
+.cardPreview p+p {
+   margin-top: 1rem;
+   color: var(--text-muted);
+}
+
+.actions {
+   display: flex;
+   gap: 1.5rem;
+   flex-wrap: wrap;
+}
+
+.actionButton {
+   padding: 1.2rem 2.5rem;
+   border-radius: 1rem;
+   border: none;
+   cursor: pointer;
+   font-size: 1.5rem;
+   font-weight: 500;
+}
+
+.actionPrimary {
+   background-color: var(--primary);
+   color: var(--text-over-primary-dark);
+}
+
+.actionPrimary:hover {
+   background-color: var(--primary-dark);
+   transition: all 0.2s;
+}
+
+.actionSecondary {
+   background-color: var(--gray-100);
+   color: var(--text-default);
+}
+
+.actionSecondary:hover {
+   background-color: var(--gray-200);
+   transition: all 0.2s;
+}

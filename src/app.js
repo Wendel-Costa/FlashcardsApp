@@ -1,26 +1,26 @@
-import express from "express";
-import connectToDatabase from "./config/dbConnect.js";
-import routes from "./routes/index.js";
+import express from 'express';
+import connectToDatabase from './config/dbConnect.js';
+import routes from './routes/index.js';
 
-import cors from "cors";
-
-
+import cors from 'cors';
 
 const connection = await connectToDatabase();
 
-connection.on("error", (error) => {
-    console.error("Connection error", error);
-})
+connection.on('error', error => {
+   console.error('Connection error', error);
+});
 
-connection.once("open", () => {
-    console.log("Database connection successful");
-})
+connection.once('open', () => {
+   console.log('Conexão com o banco feita com sucesso');
+});
 
 const app = express();
 
-app.use(cors({
-    origin: 'https://apiflashcards.vercel.app/'
-  }));
+app.use(
+   cors({
+      origin: 'https://apiflashcards.vercel.app/',
+   }),
+);
 
 routes(app);
 
