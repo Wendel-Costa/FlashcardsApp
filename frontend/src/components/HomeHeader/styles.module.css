@@ -20,6 +20,9 @@
    background-color: var(--primary);
 
    height: 5rem;
+
+   border: none;
+   width: 11rem;
 }
 
 .buttonCardAI {
@@ -39,6 +42,9 @@
    background-position: left;
 
    height: 5rem;
+   width: 11rem;
+
+   border: none;
 }
 
 .buttonOut {
@@ -55,6 +61,9 @@
    color: var(--error);
 
    height: 5rem;
+   width: 6rem;
+
+   border: none;
 }
 
 .homeHeader svg {
@@ -64,15 +73,23 @@
 
 .buttonCard:hover {
    background-color: var(--primary-dark);
+   cursor: pointer;
    transition: all 0.2s;
+   color: var(--text-over-primary);
+   font-weight: 600;
 }
 
 .buttonCardAI:hover {
-   transition: background-position 0.2s;
+   transition: all 0.2s;
+   cursor: pointer;
    background-position: right;
+   color: var(--text-over-primary);
+   font-weight: 600;
 }
 
 .buttonOut:hover {
    background-color: var(--out-hover);
+   cursor: pointer;
    transition: all 0.2s;
+   font-weight: 600;
 }

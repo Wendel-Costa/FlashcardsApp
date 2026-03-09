@@ -1,7 +1,7 @@
 import styles from './styles.module.css'
 
 type HomeTitleProps = {
-   userName: String
+   userName: string
 }
 
 export function HomeTitle({ userName }: HomeTitleProps) {

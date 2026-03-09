@@ -1,25 +1,24 @@
-import { LogOut, Plus, Sparkles } from 'lucide-react'
-import { DefaultHeader } from '../DefaultHeader'
-import styles from './styles.module.css'
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import styles from './styles.module.css';
+import { DefaultHeader } from '../DefaultHeader';
 
 export function HomeHeader() {
+   const { logout } = useAuth();
+   const navigate = useNavigate();
+
+   function handleLogout() {
+      logout();
+      navigate('/login');
+   }
+
    return (
       <DefaultHeader>
          <div className={styles.homeHeader}>
-            <a href="" className={styles.buttonCard}>
-               <Plus />
-               <div>Criar Card</div>
-            </a>
-
-            <a href="" className={styles.buttonCardAI}>
-               <Sparkles />
-               <div>Criar Card Com IA</div>
-            </a>
-
-            <a href="" className={styles.buttonOut}>
-               <LogOut />
-               <div>Sair</div>
-            </a>
+            <button onClick={() => navigate('/review')} className={styles.buttonCard}>Revisar Tudo</button>
+            <button onClick={() => navigate('/create-card')} className={styles.buttonCard}>Criar Card</button>
+            <button onClick={() => navigate('/create-deck')} className={styles.buttonCardAI}>Gerar Deck IA</button>
+            <button onClick={handleLogout} className={styles.buttonOut}>Sair</button>
          </div>
       </DefaultHeader>
    )
