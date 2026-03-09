@@ -2,7 +2,7 @@
    display: flex;
    align-items: center;
    gap: 2rem;
-   padding-right: 1rem;
+   padding: 0 1rem;
 }
 
 .buttonCard {

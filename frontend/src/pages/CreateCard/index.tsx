@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MainTemplate } from '../../templates/MainTemplate';
 import { cardService } from '../../services/cardService';
 import styles from './styles.module.css';
@@ -19,7 +18,6 @@ export function CreateCard() {
    const [isLoading, setIsLoading] = useState(false);
    const [error, setError] = useState('');
    const [success, setSuccess] = useState('');
-   const navigate = useNavigate();
 
    async function handleManualSubmit(e: FormEvent) {
       e.preventDefault();
@@ -31,10 +29,10 @@ export function CreateCard() {
       try {
          await cardService.createCard({ question, answer, tag });
          setSuccess('Card criado com sucesso!');
-         setTimeout(() => navigate('/'), 1500);
+         setQuestion('');
+         setAnswer('');
       } catch (err: any) {
-         console.log(err);
-         setError('Erro ao criar card');
+         setError(err.response?.data?.message || 'Erro ao criar card');
       } finally { setIsLoading(false); }
    }
 
@@ -48,7 +46,7 @@ export function CreateCard() {
       try {
          await cardService.generateCardByAI({ question, tag, detailLevel, tone });
          setSuccess('Card gerado e salvo com sucesso!');
-         setTimeout(() => navigate('/'), 1500);
+         setQuestion('');
       } catch (err: any) {
          setError(err.response?.data?.message || 'Erro ao gerar card com IA');
       } finally { setIsLoading(false); }

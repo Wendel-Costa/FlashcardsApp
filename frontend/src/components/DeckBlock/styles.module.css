@@ -46,21 +46,65 @@
 }
 
 .button {
-   color: var(--action);
+   color: var(--primary);
+   background: none;
 }
 
 .buttonTrash {
    color: var(--error);
+   background: none;
 }
 
 .button:hover {
-   color: var(--action-hover);
+   color: var(--action);
+   background: none;
    transition: all 0.2s;
 }
 
 .buttonTrash:hover {
    color: var(--negative-action-hover);
+   background: none;
    transition: all 0.2s;
+}
+
+.confirmButton {
+   width: 2rem;
+   height: 2rem;
+   background: none;
+   margin: 0 1rem;
+}
+
+.confirmButton:hover {
+   color: var(--action);
+   background: none;
+}
+
+.renameInput {
+   font-size: 1.6rem;
+   font-weight: 600;
+   padding: 0.6rem 0.8rem;
+   border-radius: 0.6rem;
+   border: 1.5px solid var(--primary);
+   background-color: var(--background);
+   color: var(--text-default);
+   width: 100%;
+}
+
+.renameActions {
+   display: flex;
+   gap: 0.6rem;
+}
+
+.cancelButton {
+   width: 2rem;
+   height: 2rem;
+   background: none;
+   margin: 0 1rem;
+}
+
+.cancelButton:hover {
+   color: var(--error);
+   background: none;
 }
 
 .block:hover {

@@ -77,4 +77,14 @@ export const cardService = {
       const response = await api.delete(`/cards/${id}`);
       return response.data;
    },
+
+   async renameDeck(newTag: string, cardIds: string[]): Promise<void> {
+      await Promise.all(
+         cardIds.map(id => api.put(`/cards/${id}`, { tag: newTag })),
+      );
+   },
+
+   async deleteDeck(cardIds: string[]): Promise<void> {
+      await Promise.all(cardIds.map(id => api.delete(`/cards/${id}`)));
+   },
 };

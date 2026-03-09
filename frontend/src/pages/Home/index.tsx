@@ -6,6 +6,7 @@ import { DeckBlocksSection } from '../../components/DeckBlocksSection';
 import { HomeHeader } from '../../components/HomeHeader';
 import { HomeTitle } from '../../components/HomeTitle';
 import { MainTemplate } from '../../templates/MainTemplate';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { cardService } from '../../services/cardService';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Card } from '../../models/Card';
@@ -15,6 +16,7 @@ export function Home() {
    const [cards, setCards] = useState<Card[]>([]);
    const [reviewQueue, setReviewQueue] = useState<Card[]>([]);
    const [isLoading, setIsLoading] = useState(true);
+   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
    const { username } = useAuth();
    const navigate = useNavigate();
 
@@ -36,7 +38,6 @@ export function Home() {
       fetchData();
    }, []);
 
-   // Agrupa cards por tag para formar os "decks"
    const decks = useMemo<Deck[]>(() => {
       const grouped: Record<string, Card[]> = {};
       cards.forEach((card) => {
@@ -57,17 +58,36 @@ export function Home() {
       }));
    }, [cards, reviewQueue]);
 
+   async function handleRename(deck: Deck, newName: string) {
+      try {
+         const ids = deck.cards.map((c) => c._id);
+         await cardService.renameDeck(newName, ids);
+         setCards((prev) => prev.map((c) => c.tag === deck.tag ? { ...c, tag: newName } : c));
+      } catch (err) { console.error(err); }
+   }
+
+   function handleDeleteDeck(deck: Deck) {
+      setConfirmModal({
+         message: `Excluir o deck "${deck.tag}" e todos os seus ${deck.totalCards} cards? Essa ação não pode ser desfeita.`,
+         onConfirm: async () => {
+            try {
+               await cardService.deleteDeck(deck.cards.map((c) => c._id));
+               setCards((prev) => prev.filter((c) => c.tag !== deck.tag));
+            } catch (err) { console.error(err); }
+            setConfirmModal(null);
+         },
+      });
+   }
+
    return (
       <MainTemplate>
          <HomeHeader />
          <HomeTitle userName={username || ''} />
          {isLoading ? (
-            <p>Carregando seus decks...</p>
+            <p style={{ padding: '3rem 5rem' }}>Carregando seus decks...</p>
          ) : decks.length === 0 ? (
             <Container>
-               <p>Você ainda não tem cards.</p>
-               <button onClick={() => navigate('/create-card')}>Criar Card Manual</button>
-               <button onClick={() => navigate('/create-deck')}>Criar Deck com IA</button>
+               <p>Você ainda não tem cards. Crie seu primeiro!</p>
             </Container>
          ) : (
             <DeckBlocksSection>
@@ -77,10 +97,21 @@ export function Home() {
                      deckName={deck.tag}
                      totalCards={deck.totalCards}
                      dueCards={deck.dueCards}
-                     onClick={() => navigate(`/deck/${encodeURIComponent(deck.tag)}`)}
+                     onReview={() => navigate(`/review/${encodeURIComponent(deck.tag)}`)}
+                     onView={() => navigate(`/deck/${encodeURIComponent(deck.tag)}`)}
+                     onRename={(newName) => handleRename(deck, newName)}
+                     onDelete={() => handleDeleteDeck(deck)}
                   />
                ))}
             </DeckBlocksSection>
+         )}
+
+         {confirmModal && (
+            <ConfirmModal
+               message={confirmModal.message}
+               onConfirm={confirmModal.onConfirm}
+               onCancel={() => setConfirmModal(null)}
+            />
          )}
       </MainTemplate>
    );
