@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MainTemplate } from '../../templates/MainTemplate';
 import { cardService } from '../../services/cardService';
 import styles from './styles.module.css';
-import { ArrowLeft } from 'lucide-react';
+import { DecksHeader } from '../../components/DecksHeader';
 
 type Mode = 'manual' | 'ai';
 type DetailLevel = 'low' | 'medium' | 'high';
@@ -57,11 +57,9 @@ export function CreateCard() {
    return (
       <MainTemplate>
          <div className={styles.page}>
-            <div className={styles.header}>
-               <button className={styles.back} onClick={() => navigate('/')}><ArrowLeft /> Voltar</button>
-
+            <DecksHeader>
                <h1 className={styles.title}>Criar Card</h1>
-            </div>
+            </DecksHeader>
 
             <div className={styles.tabs}>
                <button className={`${styles.tab} ${mode === 'manual' ? styles.tabActive : ''}`} onClick={() => setMode('manual')}>Manual</button>

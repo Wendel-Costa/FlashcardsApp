@@ -6,7 +6,7 @@ import { CardView } from '../pages/CardView';
 import { Register } from '../pages/Register';
 import { CreateCard } from '../pages/CreateCard';
 import { CreateDeck } from '../pages/CreateDeck';
-// import { DeckDetail } from '../pages/DeckDetail';
+import { DeckDetail } from '../pages/DeckDetail';
 // import { Guest } from '../pages/Guest';
 // import { GuestCardCreate } from '../pages/GuestCardCreate';
 // import { GuestDeckCreate } from '../pages/GuestDeckCreate';
@@ -25,5 +25,5 @@ export const router = createBrowserRouter([
    { path: '/review/:tag', element: <ProtectedRoute><CardView /></ProtectedRoute> },
    { path: '/create-card', element: <ProtectedRoute><CreateCard /></ProtectedRoute> },
    { path: '/create-deck', element: <ProtectedRoute><CreateDeck /></ProtectedRoute> },
-   //   { path: '/deck/:tag', element: <ProtectedRoute><DeckDetail /></ProtectedRoute> },
+   { path: '/deck/:tag', element: <ProtectedRoute><DeckDetail /></ProtectedRoute> },
 ]);

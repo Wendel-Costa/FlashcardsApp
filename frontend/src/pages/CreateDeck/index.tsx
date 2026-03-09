@@ -4,7 +4,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 import { cardService } from '../../services/cardService';
 import type { Card } from '../../models/Card';
 import styles from './styles.module.css';
-import { ArrowLeft } from 'lucide-react';
+import { DecksHeader } from '../../components/DecksHeader';
 
 export function CreateDeck() {
    const [topic, setTopic] = useState('');
@@ -62,11 +62,9 @@ export function CreateDeck() {
    return (
       <MainTemplate>
          <div className={styles.page}>
-            <div className={styles.header}>
-               <button className={styles.back} onClick={() => navigate('/')}><ArrowLeft /> Voltar</button>
-
+            <DecksHeader>
                <h1 className={styles.title}>Criar Deck com IA</h1>
-            </div>
+            </DecksHeader>
 
             <p className={styles.subtitle}>Gere um baralho completo automaticamente sobre qualquer tema.</p>
 
