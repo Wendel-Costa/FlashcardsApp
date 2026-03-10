@@ -81,9 +81,13 @@
 .cardText p {
    font-size: 1.5rem;
    line-height: 1.6;
-   max-height: 10rem;
+   height: 7rem;
    overflow-y: auto;
-   padding-right: 0.5rem;
+   padding-right: 0.8rem;
+   background-color: var(--background);
+   border-radius: 0.6rem;
+   padding: 1rem;
+   border: 1px solid var(--gray-200);
 }
 
 .cardText p+p {

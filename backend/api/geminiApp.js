@@ -27,9 +27,24 @@ async function generateText(topic, detailLevel, tone) {
          toneInstruction = 'Mantenha um tom neutro.';
    }
 
-   const prompt = `Crie um texto baseado no formato de flashcards. Se o nível de detalhe for alto, faça um texto detalhado sobre o tópico; se o nível for médio, resuma em apenas 1 parágrafo; se o nível for baixo, resuma em 1 linha. ${toneInstruction} Nível de detalhe: ${detailLevel}. Assunto do flashcard: ${topic}`;
+   let lengthInstruction = '';
+   switch (detailLevel) {
+      case 'low':
+         lengthInstruction = 'Responda em exatamente 1 linha curta.';
+         break;
+      case 'medium':
+         lengthInstruction = 'Responda em exatamente 1 parágrafo.';
+         break;
+      case 'high':
+         lengthInstruction =
+            'Forneça uma resposta detalhada e completa em vários parágrafos.';
+         break;
+   }
+
+   const prompt = `Você é um assistente que gera respostas para flashcards de estudo. Sua tarefa é gerar APENAS o texto da resposta para o seguinte tema, sem títulos, sem formatação especial, sem prefixos como "Resposta:" ou "Verso:". Escreva diretamente o conteúdo explicativo. ${toneInstruction} ${lengthInstruction} Tema: ${topic}`;
 
    const result = await model.generateContent(prompt);
+
    const generatedText = result.response.text();
    return generatedText;
 }

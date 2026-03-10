@@ -1,10 +1,23 @@
-.text {
-   color: var(--action);
+.repoLink {
+   display: flex;
+   align-items: center;
+   gap: 0.6rem;
+
+   padding: 0.8rem 1.6rem;
+   border-radius: 0.8rem;
+   border: 1.5px solid var(--gray-200);
+
+   font-size: 1.4rem;
+   font-weight: 500;
    text-decoration: none;
+   color: var(--text-muted);
+
+   background-color: transparent;
 }
 
-.text:hover {
-   color: var(--action-hover);
+.repoLink:hover {
+   border-color: var(--gray-400);
+   color: var(--text-default);
+   background-color: var(--gray-100);
    transition: all 0.2s;
-   cursor: pointer;
 }
