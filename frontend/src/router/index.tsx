@@ -7,17 +7,17 @@ import { Register } from '../pages/Register';
 import { CreateCard } from '../pages/CreateCard';
 import { CreateDeck } from '../pages/CreateDeck';
 import { DeckDetail } from '../pages/DeckDetail';
-// import { Guest } from '../pages/Guest';
-// import { GuestCardCreate } from '../pages/GuestCardCreate';
-// import { GuestDeckCreate } from '../pages/GuestDeckCreate';
+import { Guest } from '../pages/Guest';
+import { GuestCardCreate } from '../pages/GuestCardCreate';
+import { GuestDeckCreate } from '../pages/GuestDeckCreate';
 
 export const router = createBrowserRouter([
    // Rotas públicas
    { path: '/login', element: <Login /> },
    { path: '/register', element: <Register /> },
-   //   { path: '/guest', element: <Guest /> },
-   //   { path: '/guest/card', element: <GuestCardCreate /> },
-   //   { path: '/guest/deck', element: <GuestDeckCreate /> },
+   { path: '/guest', element: <Guest /> },
+   { path: '/guest/card', element: <GuestCardCreate /> },
+   { path: '/guest/deck', element: <GuestDeckCreate /> },
 
    // Rotas protegidas
    { path: '/', element: <ProtectedRoute><Home /></ProtectedRoute> },

@@ -1,0 +1,172 @@
+.page {
+   max-width: 60rem;
+   margin: 0 auto;
+   padding: 3rem 2rem;
+}
+
+.header {
+   padding-left: 10rem;
+}
+
+.title {
+   font-size: 2.8rem;
+   font-weight: 700;
+   margin-bottom: 0.5rem;
+}
+
+.badge {
+   display: inline-block;
+   font-size: 1.2rem;
+   background-color: var(--gray-100);
+   color: var(--gray-400);
+   padding: 0.3rem 1rem;
+   border-radius: 2rem;
+   margin-bottom: 3rem;
+}
+
+.form {
+   background-color: var(--secondBackground);
+   border-radius: 1rem;
+   padding: 3rem;
+   box-shadow: 0 1px 3px var(--gray-200);
+   display: flex;
+   flex-direction: column;
+   gap: 2rem;
+}
+
+.field {
+   display: flex;
+   flex-direction: column;
+   gap: 0.8rem;
+}
+
+.field label {
+   font-size: 1.4rem;
+   font-weight: 600;
+   color: var(--text-muted);
+   display: flex;
+   flex-direction: column;
+   gap: 0.8rem;
+}
+
+.field input,
+.field select {
+   padding: 1.2rem;
+   border-radius: 0.8rem;
+   border: 1.5px solid var(--gray-200);
+   background-color: var(--background);
+   font-size: 1.5rem;
+   color: var(--text-default);
+}
+
+.field input:focus,
+.field select:focus {
+   outline: none;
+   border-color: var(--primary);
+}
+
+.error {
+   color: var(--error);
+   font-size: 1.4rem;
+}
+
+.submitButton {
+   padding: 1.4rem;
+   border-radius: 1rem;
+   border: none;
+   cursor: pointer;
+   font-size: 1.6rem;
+   font-weight: 600;
+   color: var(--text-over-primary-dark);
+   background: linear-gradient(135deg, var(--primary), var(--info));
+   background-size: 200% 200%;
+   background-position: left;
+}
+
+.submitButton:hover:not(:disabled) {
+   background-position: right;
+   transition: background-position 0.3s;
+}
+
+.submitButton:disabled {
+   background: var(--disabled);
+   cursor: not-allowed;
+}
+
+.result {
+   margin-top: 2rem;
+}
+
+.resultCard {
+   height: 40rem;
+   border: 2px solid var(--primary);
+   border-radius: 1rem;
+   padding: 3rem;
+   background-color: var(--secondBackground);
+}
+
+.resultLabel {
+   font-size: 1.2rem;
+   font-weight: 600;
+   color: var(--primary);
+   letter-spacing: 0.1rem;
+   margin-bottom: 1rem;
+}
+
+.resultQuestion {
+   font-size: 1.9rem;
+   font-weight: 600;
+   margin-bottom: 2.5rem;
+   line-height: 1.5;
+}
+
+.divider {
+   border: none;
+   border-top: 1px solid var(--gray-200);
+   margin-bottom: 2.5rem;
+}
+
+.resultAnswer {
+   font-size: 1.6rem;
+   line-height: 1.7;
+   color: var(--text-muted);
+}
+
+.resultActions {
+   display: flex;
+   gap: 1.5rem;
+   margin-top: 2.5rem;
+   flex-wrap: wrap;
+}
+
+.registerButton {
+   border-radius: 1rem;
+   border: 2.5px solid var(--gray-400);
+   cursor: pointer;
+   font-size: 1.5rem;
+   background: none;
+   color: var(--gray-400);
+}
+
+.registerButton:hover {
+   border-color: var(--action);
+   color: var(--action);
+   background: none;
+   transition: all 0.2s;
+}
+
+.retryButton {
+   padding: 1.2rem 2.5rem;
+   border-radius: 1rem;
+   border: none;
+   cursor: pointer;
+   font-size: 1.5rem;
+   font-weight: 600;
+   background-color: var(--primary);
+   color: var(--text-over-primary-dark);
+}
+
+.retryButton:hover {
+   background-color: var(--action);
+   transition: all 0.2s;
+}
