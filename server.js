@@ -38,6 +38,11 @@ app.use(async (req, res, next) => {
    next();
 });
 
-app.use(routes);
+app.use('/api', routes);
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+   console.log(`Servidor ouvindo na porta ${port}`);
+});
 
 export default app;
