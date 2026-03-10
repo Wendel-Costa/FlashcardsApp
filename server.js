@@ -15,7 +15,6 @@ app.use(
             /^https:\/\/.*\.app\.github\.dev$/,
             /^https:\/\/flashappcards\.vercel\.app$/,
          ];
-
          if (!origin || allowed.some(pattern => pattern.test(origin))) {
             callback(null, true);
          } else {
@@ -29,7 +28,6 @@ app.use(
 app.use(express.json());
 
 let isConnected = false;
-
 app.use(async (req, res, next) => {
    if (!isConnected) {
       await connectToDatabase();
@@ -39,10 +37,5 @@ app.use(async (req, res, next) => {
 });
 
 app.use('/api', routes);
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-   console.log(`Servidor ouvindo na porta ${port}`);
-});
 
 export default app;
