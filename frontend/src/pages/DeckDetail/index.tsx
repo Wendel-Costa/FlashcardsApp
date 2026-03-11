@@ -63,12 +63,20 @@ export function DeckDetail() {
          <div className={styles.page}>
             <DecksHeader>
                <div className={styles.pageHeader}>
-                  <h1 className={styles.title}>
+                  <div className={styles.title}>
                      {deckName} ({cards.length} cards)
-                  </h1>
+                  </div>
 
                   <div className={styles.headerActions}>
-                     {dueCount > 0 && (
+
+                     {dueCount === 0 ? (
+                        <button
+                           className={`${styles.reviewButton} ${styles.reviewButtonDisabled}`}
+                           onClick={() => navigate(`/review/${tag}`)}
+                        >
+                           Revisar ({dueCount})
+                        </button>
+                     ) : (
                         <button
                            className={styles.reviewButton}
                            onClick={() => navigate(`/review/${tag}`)}

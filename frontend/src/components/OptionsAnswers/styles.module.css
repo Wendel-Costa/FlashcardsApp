@@ -7,3 +7,22 @@
    margin: 2rem 35rem 0 35rem;
    height: 5rem;
 }
+
+@media (max-width: 768px) {
+   .options {
+      margin: 2rem 0 0 0;
+   }
+}
+
+@media (max-width: 500px) {
+   .options {
+      gap: 1rem
+   }
+}
+
+@media (max-width: 500px) {
+   .options {
+      flex-wrap: wrap;
+      height: 10rem;
+   }
+}

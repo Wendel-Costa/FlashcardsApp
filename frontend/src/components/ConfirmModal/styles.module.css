@@ -12,9 +12,10 @@
 .modal {
    background-color: var(--secondBackground);
    border-radius: 1.2rem;
-   padding: 3rem;
+   padding: 0 2rem;
    max-width: 45rem;
    width: 90%;
+   height: 20rem;
    box-shadow: 0 10px 40px rgba(10, 15, 26, 0.2);
 }
 
@@ -23,11 +24,14 @@
    line-height: 1.6;
    color: var(--text-default);
    margin-bottom: 2.5rem;
+   height: 7rem;
+   text-align: center;
 }
 
 .actions {
    display: flex;
-   justify-content: flex-end;
+   align-items: center;
+   justify-content: center;
    gap: 1.2rem;
 }
 

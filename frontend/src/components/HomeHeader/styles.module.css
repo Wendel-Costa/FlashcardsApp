@@ -93,3 +93,54 @@
    transition: all 0.2s;
    font-weight: 600;
 }
+
+/*responsivo*/
+
+.mobileMenuButton {
+   display: none;
+}
+
+.mobileMenuButton button {
+   font-size: 2rem;
+   background: none;
+   border: none;
+   cursor: pointer;
+   color: var(--text-primary);
+
+   width: 6rem;
+}
+
+.mobileMenu {
+   position: absolute;
+   top: 6rem;
+   right: 1rem;
+
+   display: flex;
+   flex-direction: column;
+   gap: 1rem;
+
+   padding: 1rem;
+
+   background: var(--background);
+   border-radius: 1rem;
+
+   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+   .homeHeader {
+      display: none;
+   }
+
+   .mobileMenuButton {
+      display: flex;
+      align-items: center;
+      padding-right: 1rem;
+   }
+
+   .mobileMenu button {
+      width: 14rem;
+      height: 4rem;
+   }
+
+}
