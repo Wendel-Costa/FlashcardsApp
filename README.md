@@ -1,41 +1,156 @@
-# Flashcards Inteligentes com Gemini AI
+# 🃏 Flashcards App
 
-Um aplicativo web para criar e estudar flashcards de forma inteligente, utilizando a IA do Gemini para gerar conteúdo com base nos tópicos fornecidos pelo usuário.
-Deploy: https://apiflashcards.vercel.app/
+Aplicativo web completo para criar e estudar flashcards com repetição espaçada (SRS) e geração de conteúdo por Inteligência Artificial.
 
-## Funcionalidades Principais
+🔗 **Frontend:** https://flashappcards.vercel.app  
+🔗 **Backend:** https://flashcardsapi.vercel.app
 
-* **Criação Inteligente de Flashcards:** Utilize a IA do Gemini para gerar automaticamente a resposta para seus flashcards com base no tópico e nível de detalhe desejado.
-* **Interface Intuitiva:** Uma interface de usuário simples e amigável para criar, visualizar e estudar seus flashcards.
-* **Organização por Tags:** Organize seus flashcards utilizando tags para facilitar a busca e o estudo de tópicos específicos.
-* **Estudo no Estilo Anki:** Uma seção dedicada ao estudo dos flashcards com a mecânica de "mostrar resposta", "acertei" e "errei", similar ao Anki, para otimizar a memorização.
-* **Autenticação de Usuários:** Sistema de login e registro para que cada usuário possa gerenciar seus próprios conjuntos de flashcards.
-* **Persistência de Dados:** Os flashcards e informações dos usuários são armazenados de forma segura no MongoDB.
+---
 
-## Tecnologias Utilizadas
+## ✨ Funcionalidades
 
-* **Frontend:** HTML, CSS, JavaScript (futuramente react)
-* **Backend:** Node.js, Express
-* **Banco de Dados:** MongoDB, Mongoose
-* **Inteligência Artificial:** Gemini API (`@google/generative-ai`)
-* **Outros:** dotenv, cors, nodemon
+- **Criação manual de flashcards** com pergunta, resposta e tag para organização por decks
+- **Geração por IA (Gemini):** crie um card individual ou um deck inteiro a partir de um tópico, com controle de nível de detalhe e tom da resposta
+- **Modo visitante:** experimente a geração por IA sem precisar criar uma conta
+- **Revisão com SRS (Repetição Espaçada):** sistema inspirado no Anki com os níveis Errado, Difícil e Correto — cada resposta ajusta automaticamente o intervalo até a próxima revisão do card
+- **Gerenciamento de decks:** renomeie e exclua decks; edite e remova cards individuais
+- **Autenticação completa:** registro, login e logout com JWT
+- **Revisão geral ou por deck:** revise todos os cards com revisão pendente ou filtre por um deck específico
 
-## Como Usar
+---
 
-1.  **Registre-se ou faça login** na página inicial.
-2.  Na seção principal, insira a **pergunta** para o seu flashcard.
-3.  Adicione uma **tag** para categorizar o card (opcional).
-4.  Selecione o **nível de detalhes** desejado para a resposta gerada pela IA.
-5.  Clique no botão **"Gerar Flashcards"**. A IA do Gemini irá processar sua pergunta e gerar uma resposta, criando um novo flashcard que será exibido na tela.
-6.  Para estudar seus flashcards, clique no botão **"Iniciar Estudo Anki"**. A seção de estudo será exibida, mostrando as perguntas dos seus cards. Clique em "Mostrar Resposta" para ver a resposta e utilize os botões "Errei" e "Acertei" para avançar.
-7.  Você pode voltar para a criação de novos cards clicando em "Voltar para Criar".
-8.  Para sair da sua conta, clique no botão "Sair".
+## 🛠️ Tecnologias
 
-## Melhorias Futuras
+### Frontend
+- React + TypeScript
+- Vite
+- React Router v6
+- Axios
 
-* Implementação de diferentes tipos de flashcards (múltipla escolha, completar lacunas, etc.).
-* Opção para editar flashcards existentes.
-* Funcionalidade de busca e filtragem de flashcards por tags.
-* Integração com outras APIs de IA para diferentes funcionalidades.
-* Personalização da interface do estudo Anki.
-* Estatísticas de estudo para acompanhar o progresso do usuário.
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- JSON Web Token (JWT)
+- bcrypt
+- express-rate-limit
+
+### Inteligência Artificial
+- Gemini API (`@google/generative-ai`)
+
+---
+
+## 🗂️ Estrutura do Projeto
+
+```
+FlashcardsApp/
+├── backend/            # Lógica do servidor
+│   ├── api/            # Integração com Gemini
+│   ├── config/         # Conexão com o banco de dados
+│   ├── controllers/    # Lógica de cards e usuários
+│   ├── middleware/     # Autenticação JWT e rate limiter
+│   ├── models/         # Schemas Mongoose (Card, User)
+│   └── routes/         # Rotas da API
+├── frontend/           # Interface do usuário
+│   └── src/
+│       ├── components/ # Componentes reutilizáveis
+│       ├── contexts/   # AuthContext
+│       ├── pages/      # Páginas da aplicação
+│       ├── router/     # React Router + rotas protegidas
+│       ├── services/   # Camada de comunicação com a API
+│       └── models/     # Interfaces TypeScript
+├── server.js           # Entry point do backend
+└── vercel.json         # Configuração de deploy
+```
+
+---
+
+## 🔄 Como Funciona o SRS
+
+Ao revisar um card, você avalia sua própria resposta em três níveis:
+
+| Avaliação | Próxima revisão |
+|-----------|----------------|
+| ❌ Errado | ~10 minutos |
+| 😅 Difícil | Intervalo reduzido |
+| ✅ Correto | Intervalo aumentado progressivamente |
+
+O algoritmo ajusta o `easeFactor` e o `interval` de cada card individualmente, garantindo que cards difíceis apareçam com mais frequência e cards dominados sejam revisados cada vez mais raramente.
+
+---
+
+## 🚀 Rodando Localmente
+
+### Pré-requisitos
+- Node.js 18+
+- MongoDB
+
+### Backend
+
+```bash
+# Na raiz do projeto
+npm install
+
+# Crie o arquivo .env com:
+# DB_CONEXAO_STRING=sua_string_mongodb
+# GEMINI_API_KEY=sua_chave_gemini
+# JWT_SECRET_KEY=sua_chave_secreta
+
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+
+# Crie o arquivo .env com:
+# VITE_API_URL=http://localhost:3000
+
+npm run dev
+```
+
+---
+
+## 🔐 Variáveis de Ambiente
+
+### Backend (`.env` na raiz)
+| Variável | Descrição |
+|----------|-----------|
+| `DB_CONEXAO_STRING` | String de conexão com o MongoDB |
+| `GEMINI_API_KEY` | Chave da API do Google Gemini |
+| `JWT_SECRET_KEY` | Chave secreta para assinar os tokens JWT |
+
+### Frontend (`frontend/.env`)
+| Variável | Descrição |
+|----------|-----------|
+| `VITE_API_URL` | URL base da API do backend |
+
+---
+
+## 📡 Rotas da API
+
+### Usuários
+| Método | Rota | Descrição | Auth |
+|--------|------|-----------|------|
+| POST | `/users/register` | Registrar novo usuário | ❌ |
+| POST | `/users/login` | Fazer login | ❌ |
+
+### Cards
+| Método | Rota | Descrição | Auth |
+|--------|------|-----------|------|
+| GET | `/cards` | Listar todos os cards | ✅ |
+| GET | `/cards/review` | Listar cards com revisão pendente | ✅ |
+| POST | `/cards` | Criar card manualmente | ✅ |
+| POST | `/cards/generate` | Gerar card por IA | ✅ |
+| POST | `/cards/generate-deck` | Gerar deck por IA | ✅ |
+| PUT | `/cards/:id` | Editar card | ✅ |
+| PUT | `/cards/:id/review` | Registrar revisão SRS | ✅ |
+| PUT | `/cards/rename-deck` | Renomear deck | ✅ |
+| DELETE | `/cards/:id` | Deletar card | ✅ |
+
+### Visitante (sem autenticação)
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | `/users/guest/generate-text` | Gerar card por IA |
+| POST | `/users/guest/generate-deck` | Gerar deck por IA |
