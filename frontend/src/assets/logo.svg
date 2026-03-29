@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card de trás -->
+  <rect x="52" y="62" width="100" height="72" rx="10" fill="#c084fc" opacity="0.6" transform="rotate(-8, 102, 98)"/>
+  <!-- Card da frente -->
+  <rect x="48" y="66" width="100" height="72" rx="10" fill="#9333ea"/>
+  <!-- Linhas decorativas -->
+  <rect x="62" y="86" width="60" height="5" rx="2.5" fill="white" opacity="0.5"/>
+  <rect x="62" y="97" width="44" height="5" rx="2.5" fill="white" opacity="0.3"/>
+  <!-- Faísca IA -->
+  <polygon points="102,72 105,82 115,80 107,88 111,98 102,91 93,98 97,88 89,80 99,82" fill="#fbbf24"/>
+</svg>
